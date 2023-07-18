@@ -21,6 +21,10 @@ public class Disciplina {
         turmas.add(turma);
     }
 
+    public void adicionarTurma(Turma turma) {
+        turmas.add(turma);
+    }
+
     public void removerTurma(int id) {
         turmas.removeIf(turma -> turma.getId() == id);
     }
