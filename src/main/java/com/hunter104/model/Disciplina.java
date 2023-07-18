@@ -44,6 +44,7 @@ public class Disciplina {
 
         List<Turma> turmasList = turmas.stream().toList();
 
+        // Comparar todas as combinações de turmas nessa disciplina
         for (int i = 0; i < turmasList.size() - 1; i++) {
             for (int j = i + 1; j < turmasList.size(); j++) {
                 if (!Objects.equals(turmasList.get(i).getHorario(), turmasList.get(j).getHorario())) {
