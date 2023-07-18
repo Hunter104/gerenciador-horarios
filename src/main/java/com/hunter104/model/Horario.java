@@ -42,6 +42,10 @@ public class Horario {
         this.horas = horas;
     }
 
+    public boolean temInterseccao(DiadaSemana dia, Hora hora) {
+        return dias.contains(dia) && horas.contains(hora);
+    }
+
     @Override
     public String toString() {
         return "Horario{" +
