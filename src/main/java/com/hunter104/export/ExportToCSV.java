@@ -83,7 +83,12 @@ public class ExportToCSV {
                 for (DiadaSemana dia : DiadaSemana.values()) {
                     Disciplina disciplinadoDia = descobrirInterseccaoTurma(dia, hora, turmas);
                     if (disciplinadoDia != null) {
-                        disciplinasPorDia[coluna] = disciplinadoDia.getNome();
+                        String abreviacao = disciplinadoDia.getAbreviacao();
+                        if (abreviacao != null) {
+                            disciplinasPorDia[coluna] = abreviacao;
+                        } else {
+                            disciplinasPorDia[coluna] = disciplinadoDia.getNome();
+                        }
                     } else {
                         disciplinasPorDia[coluna] = "";
                     }

@@ -71,6 +71,12 @@ public class Main {
         Disciplina md2 = planejador.getDisciplina("MATEMÁTICA DISCRETA 2");
         Disciplina mds = planejador.getDisciplina("MÉTODOS DE DESENVOLVIMENTO DE SOFTWARE");
         Disciplina pi = planejador.getDisciplina("PROJETO INTEGRADOR DE ENGENHARIA 1");
+        eda.setAbreviacao("EDA");
+        fac.setAbreviacao("FAC");
+        gpq.setAbreviacao("GPQ");
+        md2.setAbreviacao("MD2");
+        mds.setAbreviacao("MDS");
+        pi.setAbreviacao("PI");
         turmasEscolhidas.put(eda, 3);
         turmasEscolhidas.put(fac, 1);
         turmasEscolhidas.put(gpq, 2);
