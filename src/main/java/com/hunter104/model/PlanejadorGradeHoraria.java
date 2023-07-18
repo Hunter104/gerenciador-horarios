@@ -6,11 +6,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class PlanejadordeGradeHoraria {
+public class PlanejadorGradeHoraria {
     private final Set<Disciplina> disciplinas;
     private final Set<ConflitoHorario> conflitos;
 
-    public PlanejadordeGradeHoraria() {
+    public PlanejadorGradeHoraria() {
         disciplinas = new HashSet<>();
         conflitos = new HashSet<>();
     }
@@ -114,7 +114,7 @@ public class PlanejadordeGradeHoraria {
 
         // Validar grade horária
         Set<ConflitoHorario> conflitosPossiveis = ConflitoHorario.checarPorConflito(turmasEscolhidas);
-        if (conflitosPossiveis != null) {
+        if (conflitosPossiveis == null) {
             return new GradeHoraria(turmasEscolhidas);
         } else {
             throw new IllegalArgumentException("Algumas das turmas escolhidas tem horários conflitantes");
@@ -144,7 +144,7 @@ public class PlanejadordeGradeHoraria {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PlanejadordeGradeHoraria that = (PlanejadordeGradeHoraria) o;
+        PlanejadorGradeHoraria that = (PlanejadorGradeHoraria) o;
         return Objects.equals(disciplinas, that.disciplinas) && Objects.equals(conflitos, that.conflitos);
     }
 
