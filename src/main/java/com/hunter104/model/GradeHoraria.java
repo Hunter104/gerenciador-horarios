@@ -63,10 +63,7 @@ public class GradeHoraria {
             Se menos de um horário único estiver em conflito, é possível escolher outra turma
              */
             if (disciplinasHorarioUnico.size() == 1) {
-                Disciplina horarioUnico = disciplinasHorarioUnico
-                        .stream()
-                        .findFirst()
-                        .orElseThrow();
+                Disciplina horarioUnico = disciplinasHorarioUnico.iterator().next();
 
                 for (Map.Entry<Disciplina, Integer> entry : conflitoTurmas.entrySet()) {
                     Disciplina disciplina = entry.getKey();
@@ -78,6 +75,32 @@ public class GradeHoraria {
                 }
             }
         }
+
+        // Se depois das alterações algumas turmas se tornarem inalcançáveis, chamar a função novamente.
+        atualizarConflitos();
+        if (existemDisciplinasInalcancaveis()) {
+            removerTurmasInalcancaveis();
+        }
+    }
+
+    public boolean existemDisciplinasInalcancaveis() {
+        for (ConflitoHorario conflito : conflitos) {
+            Map<Disciplina, Integer> conflitoTurmas = conflito.getTurmas();
+            Set<Disciplina> disciplinasHorarioUnico =
+                    conflitoTurmas.keySet()
+                            .stream().
+                            filter(Disciplina::isHorarioUnico)
+                            .collect(Collectors.toSet());
+
+            /* Só é possível remover turmas, quando apenas uma disciplina de horário único estiver em conflito,
+            se mais de um horário único estiver em conflito, a grade é inválida.
+            Se menos de um horário único estiver em conflito, é possível escolher outra turma
+             */
+            if (disciplinasHorarioUnico.size() == 1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void atualizarConflitos() {
