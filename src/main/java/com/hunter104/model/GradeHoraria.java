@@ -33,6 +33,6 @@ public class GradeHoraria {
     }
 
     public Turma getTurma(String nomeDisciplina, int id) {
-        getDisciplina(nomeDisciplina).removerTurma(id);
+        return getDisciplina(nomeDisciplina).getTurma(id);
     }
 }
