@@ -9,6 +9,8 @@ public class Disciplina {
     private final String nome;
     private final int cargaHoraria;
     private final Set<Turma> turmas;
+    private String abreviacao;
+
 
     public Disciplina(String nome, int cargaHoraria) {
         this.nome = nome;
@@ -16,7 +18,14 @@ public class Disciplina {
         this.turmas = new HashSet<>();
     }
 
-    public void adicionarTurma(int id, String professor,String horarioCodificado) {
+    public Disciplina(String nome, String abreviacao, int cargaHoraria) {
+        this.abreviacao = abreviacao;
+        this.nome = nome;
+        this.cargaHoraria = cargaHoraria;
+        this.turmas = new HashSet<>();
+    }
+
+    public void adicionarTurma(int id, String professor, String horarioCodificado) {
         Turma turma = new Turma(id, professor, horarioCodificado);
         turmas.add(turma);
     }
@@ -79,6 +88,14 @@ public class Disciplina {
 
     public String getNome() {
         return nome;
+    }
+
+    public String getAbreviacao() {
+        return abreviacao;
+    }
+
+    public void setAbreviacao(String abreviacao) {
+        this.abreviacao = abreviacao;
     }
 
     public int getCargaHoraria() {
