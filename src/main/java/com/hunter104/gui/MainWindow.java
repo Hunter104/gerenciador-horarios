@@ -1,17 +1,18 @@
 package com.hunter104.gui;
 
+import com.hunter104.model.Disciplina;
 import com.hunter104.model.PlanejadorGradeHoraria;
 
 import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
-import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Comparator;
+import java.util.List;
 
 import static com.hunter104.Main.criarPlanejadorComDados;
 
-public class MainWindow {
+public class MainWindow implements PropertyChangeListener {
     private JTabbedPane Main;
     private JButton adicionarDisciplinaButton;
     private JButton removerDisciplinaButton;
@@ -30,10 +31,18 @@ public class MainWindow {
     private JButton exportarDadosButton;
     private final DisciplinasTableModel crudDisciplinasModel;
 
+    private final PlanejadorGradeHoraria planejador;
+
     public MainWindow() {
-        PlanejadorGradeHoraria planejador = criarPlanejadorComDados();
+        planejador = criarPlanejadorComDados();
+        planejador.addPropertyChangeListener(this);
         crudDisciplinasModel = new DisciplinasTableModel(planejador.getDisciplinas().stream().toList());
         disciplinasCrudTable.setModel(crudDisciplinasModel);
+        adicionarDisciplinaButton.addActionListener(e -> {
+            AdicionarDisciplina dialog = new AdicionarDisciplina(planejador);
+            dialog.pack();
+            dialog.setVisible(true);
+        });
     }
 
     public static void main(String[] args) {
@@ -47,5 +56,16 @@ public class MainWindow {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("disciplinas".equals(evt.getPropertyName())) {
+            List<Disciplina> disciplinasOrdenadas = planejador
+                            .getDisciplinas()
+                            .stream()
+                            .sorted(Comparator.comparing(Disciplina::getNome)).toList();
+            crudDisciplinasModel.setLinhas(disciplinasOrdenadas);
+        }
     }
 }

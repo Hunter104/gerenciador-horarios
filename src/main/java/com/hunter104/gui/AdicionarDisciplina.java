@@ -1,9 +1,11 @@
 package com.hunter104.gui;
 
+import com.hunter104.model.PlanejadorGradeHoraria;
+
 import javax.swing.*;
 import java.awt.event.*;
 
-public class adicionarDisciplina extends JDialog {
+public class AdicionarDisciplina extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -11,23 +13,17 @@ public class adicionarDisciplina extends JDialog {
     private JTextField nomeField;
     private JTextField abreviacaoField;
     private JTextField cargaHorariaField;
+    private final PlanejadorGradeHoraria planejador;
 
-    public adicionarDisciplina() {
+    public AdicionarDisciplina(PlanejadorGradeHoraria planejador) {
+        this.planejador = planejador;
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
 
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -46,7 +42,11 @@ public class adicionarDisciplina extends JDialog {
     }
 
     private void onOK() {
-        // add your code here
+        planejador.adicionarDisciplina(
+                codigoField.getText(),
+                nomeField.getText(),
+                abreviacaoField.getText(),
+                Integer.parseInt(cargaHorariaField.getText()));
         dispose();
     }
 
