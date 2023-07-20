@@ -26,6 +26,14 @@ public class Disciplina {
         this.turmas = new HashSet<>();
     }
 
+    public Disciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
+        this.codigo = codigo;
+        this.abreviacao = abreviacao;
+        this.nome = nome;
+        this.cargaHoraria = cargaHoraria;
+        this.turmas = new HashSet<>();
+    }
+
     public void adicionarTurma(int id, String professor, String horarioCodificado) {
         Turma turma = new Turma(id, professor, horarioCodificado);
         turmas.add(turma);

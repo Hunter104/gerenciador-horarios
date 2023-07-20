@@ -1,5 +1,6 @@
 package com.hunter104.model;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.PipedOutputStream;
 import java.util.HashSet;
@@ -18,8 +19,29 @@ public class PlanejadorGradeHoraria {
         support = new PropertyChangeSupport(this);
     }
 
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        support.addPropertyChangeListener(pcl);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener pcl) {
+        support.removePropertyChangeListener(pcl);
+    }
+
     public void adicionarDisciplina(String nome, int cargaHoraria) {
         Disciplina disciplina = new Disciplina(nome, cargaHoraria);
+
+        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
+        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+
+        disciplinas.add(disciplina);
+        atualizarConflitos();
+
+        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
+        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+    }
+
+    public void adicionarDisciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
+        Disciplina disciplina = new Disciplina(codigo, nome, abreviacao,cargaHoraria);
 
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
