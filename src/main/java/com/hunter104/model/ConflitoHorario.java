@@ -34,7 +34,11 @@ public class ConflitoHorario {
                 }
             }
         }
-        return conflitos;
+        if (conflitos.size() == 0) {
+            return null;
+        } else {
+            return conflitos;
+        }
     }
 
     /**

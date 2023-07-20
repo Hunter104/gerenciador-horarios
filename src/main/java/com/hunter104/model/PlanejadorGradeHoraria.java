@@ -83,24 +83,10 @@ public class PlanejadorGradeHoraria {
      * @param turmasEscolhidas turmas escolhidas para montar a grade
      * @return Um objeto representando a grade horária
      */
-/*
     public GradeHoraria criarGradeHoraria(Map<Disciplina, Integer> turmasEscolhidas) {
-
-        // Validar grade horária
-        Set<ConflitoHorario> conflitosPossiveis = ConflitoHorario.checarPorConflito(turmasEscolhidas);
-        if (conflitosPossiveis == null) {
-            */
-/* Criar disciplinas apenas com as turmas escolhidas impede que mudanças nas disciplinas do planejador
-               interfiram com a grade criada, deixando-a imutável
-             *//*
-
-            Set<Disciplina> disciplinasEscolhidas = criarDisciplinasComTurmas(turmasEscolhidas);
-            return new GradeHoraria(turmasEscolhidas);
-        } else {
-            throw new IllegalArgumentException("Algumas das turmas escolhidas tem horários conflitantes");
-        }
+        Set<Disciplina> disciplinasEscolhidas = criarDisciplinasComTurmas(turmasEscolhidas);
+        return new GradeHoraria(disciplinasEscolhidas);
     }
-*/
 
     /**
      * Cria uma cópia das disciplinas contendo apenas as turmas escolhidas
