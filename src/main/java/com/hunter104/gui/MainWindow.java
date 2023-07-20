@@ -5,6 +5,8 @@ import com.hunter104.model.PlanejadorGradeHoraria;
 
 import javax.swing.*;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Comparator;
@@ -43,6 +45,9 @@ public class MainWindow implements PropertyChangeListener {
             dialog.pack();
             dialog.setVisible(true);
         });
+        removerDisciplinaButton.addActionListener(e -> planejador.removerDisciplina(
+                crudDisciplinasModel.getDisciplina(disciplinasCrudTable.getSelectedRow()).getNome()
+        ));
     }
 
     public static void main(String[] args) {
