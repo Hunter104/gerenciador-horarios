@@ -1,5 +1,7 @@
 package com.hunter104.model;
 
+import java.beans.PropertyChangeSupport;
+import java.io.PipedOutputStream;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -8,21 +10,36 @@ import java.util.Set;
 public class PlanejadorGradeHoraria {
     private final Set<Disciplina> disciplinas;
     private Set<ConflitoHorario> conflitos;
+    private final PropertyChangeSupport support;
 
     public PlanejadorGradeHoraria() {
         disciplinas = new HashSet<>();
         conflitos = new HashSet<>();
+        support = new PropertyChangeSupport(this);
     }
 
     public void adicionarDisciplina(String nome, int cargaHoraria) {
         Disciplina disciplina = new Disciplina(nome, cargaHoraria);
+
+        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
+        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+
         disciplinas.add(disciplina);
         atualizarConflitos();
+
+        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
+        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
     public void removerDisciplina(String nome) {
+        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
+        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+
         disciplinas.removeIf(disciplina -> disciplina.getNome().equals(nome));
         atualizarConflitos();
+
+        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
+        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
     public Disciplina getDisciplina(String nome) {
@@ -58,6 +75,9 @@ public class PlanejadorGradeHoraria {
      * para a disciplina, a única opção é remover as outras turmas do conflito.
      */
     public void removerTurmasInalcancaveis() {
+        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
+        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+
         for (ConflitoHorario conflito : conflitos) {
             if (conflito.isOtimizavel()) {
                 Map<Disciplina, Integer> turmasOtimizaveis = conflito.filtrarTurmasOtimizaveis();
@@ -73,6 +93,9 @@ public class PlanejadorGradeHoraria {
         if (existemDisciplinasInalcancaveis()) {
             removerTurmasInalcancaveis();
         }
+
+        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
+        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
     /**
