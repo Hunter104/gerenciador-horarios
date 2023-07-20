@@ -1,7 +1,6 @@
 package com.hunter104;
 
 import com.hunter104.export.ExportToCSV;
-import com.hunter104.model.DiadaSemana;
 import com.hunter104.model.Disciplina;
 import com.hunter104.model.PlanejadorGradeHoraria;
 
