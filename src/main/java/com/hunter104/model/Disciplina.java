@@ -30,6 +30,11 @@ public class Disciplina {
         turmas.add(turma);
     }
 
+    public void adicionarTurma(int id, String professor, Horario horario) {
+        Turma turma = new Turma(id, professor, horario);
+        turmas.add(turma);
+    }
+
     public void adicionarTurma(Turma turma) {
         turmas.add(turma);
     }

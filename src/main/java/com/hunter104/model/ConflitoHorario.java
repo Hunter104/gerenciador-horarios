@@ -1,16 +1,34 @@
 package com.hunter104.model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ConflitoHorario {
     private final Hora hora;
     private final DiadaSemana dia;
     private final Map<Disciplina, Integer> turmas;
+    private final boolean otimizavel;
+    private final boolean impossivel;
 
     private ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Integer> turmas) {
         this.hora = hora;
         this.dia = dia;
         this.turmas = turmas;
+        this.otimizavel = isConflitoOtimizavel();
+        this.impossivel = isConflitoImpossivel();
+    }
+
+    public static Set<ConflitoHorario> checarPorConflitos(Set<Disciplina> disciplinas) {
+        Set<ConflitoHorario> conflitos = new HashSet<>();
+        for (DiadaSemana dia : DiadaSemana.values()) {
+            for (Hora hora : Hora.values()) {
+                ConflitoHorario conflito = ConflitoHorario.checarPorConflito(dia, hora, disciplinas);
+                if (conflito != null) {
+                    conflitos.add(conflito);
+                }
+            }
+        }
+        return conflitos;
     }
 
     /**
@@ -21,7 +39,7 @@ public class ConflitoHorario {
      * @param disciplinaSet conjunto de disciplinas escolhidas para o teste
      * @return um objeto ConflitoHorário representando o conflito, null caso não haja conflito
      */
-    public static ConflitoHorario checarPorConflito(DiadaSemana dia, Hora hora, Set<Disciplina> disciplinaSet) {
+    private static ConflitoHorario checarPorConflito(DiadaSemana dia, Hora hora, Set<Disciplina> disciplinaSet) {
         Map<Disciplina, Integer> turmasIntercedentes = new HashMap<>();
         for (Disciplina disciplina : disciplinaSet) {
             for (Turma turma : disciplina.getTurmas()) {
@@ -39,54 +57,34 @@ public class ConflitoHorario {
     }
 
     /**
-     * Checa se apenas as turmas escolhidasse conflitam em um certo bloco de horário
-     *
-     * @param dia              dia da semana escolhido para teste
-     * @param hora             hora escolhida para teste
-     * @param turmasEscolhidas turmas escolhidas para o teste
-     * @return um objeto ConflitoHorário representando o conflito, null caso não haja conflito
+     * Checa se esse conflito é impossível de se resolver
      */
-    private static ConflitoHorario checarPorConflito(DiadaSemana dia, Hora hora, Map<Disciplina, Integer> turmasEscolhidas) {
-        Map<Disciplina, Integer> turmasIntercedentes = new HashMap<>();
-        for (Map.Entry<Disciplina, Integer> parTurma : turmasEscolhidas.entrySet()) {
-            Disciplina disciplina = parTurma.getKey();
-            int id = parTurma.getValue();
-
-            Turma turmaAtual = disciplina.getTurma(id);
-            Horario horario = turmaAtual.getHorario();
-            if (horario.temInterseccao(dia, hora)) {
-                turmasIntercedentes.put(disciplina, id);
-            }
-        }
-        if (turmasIntercedentes.size() > 1) {
-            return new ConflitoHorario(dia, hora, turmasIntercedentes);
-        } else {
-            return null;
-        }
+    private boolean isConflitoImpossivel() {
+        return filtrarDisciplinasHorarioUnico().size() > 1;
     }
 
-    /**
-     * Checa se as turmas escolhidas conflitam entre sí
-     *
-     * @param turmasEscolhidas turmas escolhidas para teste
-     * @return Um conjunto representando todos os conflitos, null caso não haja
+    /* Só é possível remover turmas, quando apenas uma disciplina de horário único estiver em conflito,
+    se mais de um horário único estiver em conflito, a grade é inválida.
+    Se menos de um horário único estiver em conflito, é possível escolher outra turma
      */
-    public static Set<ConflitoHorario> checarPorConflito(Map<Disciplina, Integer> turmasEscolhidas) {
-        Set<ConflitoHorario> conflitos = new HashSet<>();
-        for (DiadaSemana dia : DiadaSemana.values()) {
-            for (Hora hora : Hora.values()) {
-                ConflitoHorario conflitoPossivel = checarPorConflito(dia, hora, turmasEscolhidas);
-                if (conflitoPossivel != null) {
-                    conflitos.add(conflitoPossivel);
-                }
-            }
-        }
-        if (conflitos.size() > 0) {
-            return conflitos;
-        } else {
-            return null;
-        }
+    private boolean isConflitoOtimizavel() {
+        return filtrarDisciplinasHorarioUnico().size() == 1;
     }
+
+    public Map<Disciplina, Integer> filtrarTurmasOtimizaveis() {
+        if (otimizavel) {
+            Disciplina horarioUnico = filtrarDisciplinasHorarioUnico().iterator().next();
+            return turmas.entrySet().stream()
+                    .filter(turmaEntry -> !turmaEntry.getKey().equals(horarioUnico))
+                    .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
+        }
+        return null;
+    }
+
+    public List<Disciplina> filtrarDisciplinasHorarioUnico() {
+        return turmas.keySet().stream().filter(Disciplina::isHorarioUnico).toList();
+    }
+
 
     @Override
     public String toString() {
@@ -108,6 +106,14 @@ public class ConflitoHorario {
     @Override
     public int hashCode() {
         return Objects.hash(hora, dia, turmas);
+    }
+
+    public boolean isOtimizavel() {
+        return otimizavel;
+    }
+
+    public boolean isImpossivel() {
+        return impossivel;
     }
 
     public Hora getHora() {

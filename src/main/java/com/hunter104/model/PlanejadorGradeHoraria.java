@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class PlanejadorGradeHoraria {
     private final Set<Disciplina> disciplinas;
-    private final Set<ConflitoHorario> conflitos;
+    private Set<ConflitoHorario> conflitos;
 
     public PlanejadorGradeHoraria() {
         disciplinas = new HashSet<>();
@@ -47,18 +47,7 @@ public class PlanejadorGradeHoraria {
 
     public boolean existemDisciplinasInalcancaveis() {
         for (ConflitoHorario conflito : conflitos) {
-            Map<Disciplina, Integer> conflitoTurmas = conflito.getTurmas();
-            Set<Disciplina> disciplinasHorarioUnico =
-                    conflitoTurmas.keySet()
-                            .stream().
-                            filter(Disciplina::isHorarioUnico)
-                            .collect(Collectors.toSet());
-
-            /* Só é possível remover turmas, quando apenas uma disciplina de horário único estiver em conflito,
-            se mais de um horário único estiver em conflito, a grade é inválida.
-            Se menos de um horário único estiver em conflito, é possível escolher outra turma
-             */
-            if (disciplinasHorarioUnico.size() == 1) {
+            if (conflito.isOtimizavel()) {
                 return true;
             }
         }
@@ -71,27 +60,11 @@ public class PlanejadorGradeHoraria {
      */
     public void removerTurmasInalcancaveis() {
         for (ConflitoHorario conflito : conflitos) {
-            Map<Disciplina, Integer> conflitoTurmas = conflito.getTurmas();
-            Set<Disciplina> disciplinasHorarioUnico =
-                    conflitoTurmas.keySet()
-                            .stream().
-                            filter(Disciplina::isHorarioUnico)
-                            .collect(Collectors.toSet());
-
-            /* Só é possível remover turmas, quando apenas uma disciplina de horário único estiver em conflito,
-            se mais de um horário único estiver em conflito, a grade é inválida.
-            Se menos de um horário único estiver em conflito, é possível escolher outra turma
-             */
-            if (disciplinasHorarioUnico.size() == 1) {
-                Disciplina horarioUnico = disciplinasHorarioUnico.iterator().next();
-
-                for (Map.Entry<Disciplina, Integer> entry : conflitoTurmas.entrySet()) {
-                    Disciplina disciplina = entry.getKey();
-                    int id = entry.getValue();
-
-                    if (!Objects.equals(disciplina, horarioUnico)) {
-                        disciplina.removerTurma(id);
-                    }
+            if (conflito.isOtimizavel()) {
+                Map<Disciplina, Integer> turmasOtimizaveis = conflito.filtrarTurmasOtimizaveis();
+                for (Map.Entry<Disciplina, Integer> turmaEntry : turmasOtimizaveis.entrySet()) {
+                    Disciplina disciplina = turmaEntry.getKey();
+                    disciplina.removerTurma(turmaEntry.getValue());
                 }
             }
         }
@@ -110,26 +83,51 @@ public class PlanejadorGradeHoraria {
      * @param turmasEscolhidas turmas escolhidas para montar a grade
      * @return Um objeto representando a grade horária
      */
+/*
     public GradeHoraria criarGradeHoraria(Map<Disciplina, Integer> turmasEscolhidas) {
 
         // Validar grade horária
         Set<ConflitoHorario> conflitosPossiveis = ConflitoHorario.checarPorConflito(turmasEscolhidas);
         if (conflitosPossiveis == null) {
+            */
+/* Criar disciplinas apenas com as turmas escolhidas impede que mudanças nas disciplinas do planejador
+               interfiram com a grade criada, deixando-a imutável
+             *//*
+
+            Set<Disciplina> disciplinasEscolhidas = criarDisciplinasComTurmas(turmasEscolhidas);
             return new GradeHoraria(turmasEscolhidas);
         } else {
             throw new IllegalArgumentException("Algumas das turmas escolhidas tem horários conflitantes");
         }
     }
+*/
+
+    /**
+     * Cria uma cópia das disciplinas contendo apenas as turmas escolhidas
+     * @param turmasEscolhidas turmas escolhidas para copiar
+     * @return um conjunto com uma cópia das disciplinas contendo apenas as turmas escolhidas
+     */
+    private Set<Disciplina> criarDisciplinasComTurmas(Map<Disciplina, Integer> turmasEscolhidas) {
+        Set<Disciplina> disciplinas = new HashSet<>();
+        for (Map.Entry<Disciplina, Integer> turmaEntry : turmasEscolhidas.entrySet()) {
+            Disciplina disciplinaAtual = turmaEntry.getKey();
+            Turma turmaAtual = disciplinaAtual.getTurma(turmaEntry.getValue());
+            Disciplina disciplinaCopiada = new Disciplina(
+                    disciplinaAtual.getNome(),
+                    disciplinaAtual.getAbreviacao(),
+                    disciplinaAtual.getCargaHoraria());
+            disciplinaCopiada.adicionarTurma(
+                    turmaAtual.getId(),
+                    turmaAtual.getProfessor(),
+                    turmaAtual.getHorario()
+            );
+            disciplinas.add(disciplinaCopiada);
+        }
+        return disciplinas;
+    }
 
     public void atualizarConflitos() {
-        for (DiadaSemana dia : DiadaSemana.values()) {
-            for (Hora hora : Hora.values()) {
-                ConflitoHorario conflito = ConflitoHorario.checarPorConflito(dia, hora, disciplinas);
-                if (conflito != null) {
-                    conflitos.add(conflito);
-                }
-            }
-        }
+        conflitos = ConflitoHorario.checarPorConflitos(disciplinas);
     }
 
     @Override
