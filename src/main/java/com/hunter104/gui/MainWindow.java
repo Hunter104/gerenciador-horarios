@@ -1,10 +1,18 @@
 package com.hunter104.gui;
 
+import com.hunter104.model.PlanejadorGradeHoraria;
+
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+
+import java.awt.*;
+
+import static com.hunter104.Main.criarPlanejadorComDados;
 
 public class MainWindow {
     private JTabbedPane Main;
-    private JTable table1;
     private JButton adicionarDisciplinaButton;
     private JButton removerDisciplinaButton;
     private JTable turmasCrudTable;
@@ -13,14 +21,20 @@ public class MainWindow {
     private JButton otimizarButton;
     private JButton visualizarConflitoButton;
     private JTable horarioConflitoTable;
-    private JTable table4;
-    private JScrollPane turmasConflitoTable;
-    private JScrollPane disciplinasCrudTable;
-    private JTable table2;
-    private JTable table3;
+    private JTable turmasConflitoTable;
+    private JTable disciplinasCrudTable;
+    private JTable turmasPossiveisTable;
+    private JTable turmasEscolhidasTable;
     private JButton escolherTurmaButton;
     private JButton removerTurmaButton1;
     private JButton exportarDadosButton;
+    private final DisciplinasTableModel crudDisciplinasModel;
+
+    public MainWindow() {
+        PlanejadorGradeHoraria planejador = criarPlanejadorComDados();
+        crudDisciplinasModel = new DisciplinasTableModel(planejador.getDisciplinas().stream().toList());
+        disciplinasCrudTable.setModel(crudDisciplinasModel);
+    }
 
     public static void main(String[] args) {
         try {
