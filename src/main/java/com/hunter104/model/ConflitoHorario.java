@@ -14,8 +14,14 @@ public class ConflitoHorario {
         this.hora = hora;
         this.dia = dia;
         this.turmas = turmas;
-        this.otimizavel = isConflitoOtimizavel();
-        this.impossivel = isConflitoImpossivel();
+
+        List<Disciplina> disciplinasHorarioUnico = filtrarDisciplinasHorarioUnico();
+        /* Só é possível remover turmas, quando apenas uma disciplina de horário único estiver em conflito,
+        se mais de um horário único estiver em conflito, a grade é inválida.
+        Se menos de um horário único estiver em conflito, é possível escolher outra turma
+         */
+        this.otimizavel = disciplinasHorarioUnico.size() == 1;
+        this.impossivel = disciplinasHorarioUnico.size() > 1;
     }
 
     public static Set<ConflitoHorario> checarPorConflitos(Set<Disciplina> disciplinas) {
@@ -56,21 +62,6 @@ public class ConflitoHorario {
         }
     }
 
-    /**
-     * Checa se esse conflito é impossível de se resolver
-     */
-    private boolean isConflitoImpossivel() {
-        return filtrarDisciplinasHorarioUnico().size() > 1;
-    }
-
-    /* Só é possível remover turmas, quando apenas uma disciplina de horário único estiver em conflito,
-    se mais de um horário único estiver em conflito, a grade é inválida.
-    Se menos de um horário único estiver em conflito, é possível escolher outra turma
-     */
-    private boolean isConflitoOtimizavel() {
-        return filtrarDisciplinasHorarioUnico().size() == 1;
-    }
-
     public Map<Disciplina, Integer> filtrarTurmasOtimizaveis() {
         if (otimizavel) {
             Disciplina horarioUnico = filtrarDisciplinasHorarioUnico().iterator().next();
@@ -84,7 +75,6 @@ public class ConflitoHorario {
     public List<Disciplina> filtrarDisciplinasHorarioUnico() {
         return turmas.keySet().stream().filter(Disciplina::isHorarioUnico).toList();
     }
-
 
     @Override
     public String toString() {
