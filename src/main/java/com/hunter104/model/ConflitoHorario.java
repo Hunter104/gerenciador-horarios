@@ -24,6 +24,7 @@ public class ConflitoHorario {
         this.impossivel = disciplinasHorarioUnico.size() > 1;
     }
 
+
     public static Set<ConflitoHorario> checarPorConflitos(Set<Disciplina> disciplinas) {
         Set<ConflitoHorario> conflitos = new HashSet<>();
         for (DiadaSemana dia : DiadaSemana.values()) {

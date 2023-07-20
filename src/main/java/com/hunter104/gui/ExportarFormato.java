@@ -3,17 +3,13 @@ package com.hunter104.gui;
 import javax.swing.*;
 import java.awt.event.*;
 
-public class adicionarTurma extends JDialog {
+public class ExportarFormato extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField textField1;
-    private JTextField textField2;
     private JComboBox comboBox1;
-    private JTextField textField3;
-    private JTextField textField4;
 
-    public adicionarTurma() {
+    public ExportarFormato() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -54,5 +50,12 @@ public class adicionarTurma extends JDialog {
     private void onCancel() {
         // add your code here if necessary
         dispose();
+    }
+
+    public static void main(String[] args) {
+        ExportarFormato dialog = new ExportarFormato();
+        dialog.pack();
+        dialog.setVisible(true);
+        System.exit(0);
     }
 }
