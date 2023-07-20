@@ -6,10 +6,11 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Disciplina {
-    private final String nome;
-    private final int cargaHoraria;
-    private final Set<Turma> turmas;
+    private String nome;
+    private int cargaHoraria;
+    private Set<Turma> turmas;
     private String abreviacao;
+    private String codigo;
 
 
     public Disciplina(String nome, int cargaHoraria) {
@@ -95,6 +96,26 @@ public class Disciplina {
         return nome;
     }
 
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public int getCargaHoraria() {
+        return cargaHoraria;
+    }
+
+    public void setCargaHoraria(int cargaHoraria) {
+        this.cargaHoraria = cargaHoraria;
+    }
+
+    public Set<Turma> getTurmas() {
+        return turmas;
+    }
+
+    public void setTurmas(Set<Turma> turmas) {
+        this.turmas = turmas;
+    }
+
     public String getAbreviacao() {
         return abreviacao;
     }
@@ -103,11 +124,11 @@ public class Disciplina {
         this.abreviacao = abreviacao;
     }
 
-    public int getCargaHoraria() {
-        return cargaHoraria;
+    public String getCodigo() {
+        return codigo;
     }
 
-    public Set<Turma> getTurmas() {
-        return turmas;
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 }
