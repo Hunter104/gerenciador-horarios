@@ -12,43 +12,8 @@ public class Horario {
     private Set<DiadaSemana> dias;
     private String horarioCodificado;
 
-    @Deprecated
-    public Horario(String horarioCodificado) {
-        this.horarioCodificado = horarioCodificado;
-        Pattern pattern = Pattern.compile("(\\d+)(\\w)(\\d+)", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(horarioCodificado);
-
-        if (matcher.find()) {
-
-            String codigoDias = matcher.group(1);
-            String codigoTurno = matcher.group(2);
-            String codigoHorario = matcher.group(3);
-
-            dias = Arrays.stream(DiadaSemana.values())
-                    .filter(turno -> codigoDias.contains(String.valueOf(turno.getCodigo())))
-                    .collect(Collectors.toSet());
-
-            Turno turnoAtual = Arrays.stream(Turno.values())
-                    .filter(turnoPossivel -> turnoPossivel.getCodigo().equals(codigoTurno))
-                    .findFirst()
-                    .orElseThrow();
-
-            horas = Arrays.stream(Hora.values())
-                    .filter(horarios -> horarios.getTurno().equals(turnoAtual) && codigoHorario.contains(horarios.getCodigo()))
-                    .collect(Collectors.toSet());
-
-            boolean nenhumDia = dias.size() == 0;
-            boolean nenhumaHora = horas.size() == 0;
-            if (nenhumDia || nenhumaHora) {
-                throw new IllegalArgumentException("código de horário tem formato inválido");
-            }
-        } else {
-            throw new IllegalArgumentException("código de horário tem formato inválido");
-        }
-    }
-
     public static Horario criarFromCodigo(String horarioCodificado) {
-        Pattern pattern = Pattern.compile("(\\d+)(\\w)(\\d+)", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("^([2-7]+)([MNT])([1-5]+)$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(horarioCodificado);
         if (matcher.find()) {
 
@@ -79,12 +44,6 @@ public class Horario {
         } else {
             throw new IllegalArgumentException("código de horário tem formato inválido");
         }
-    }
-
-    @Deprecated
-    public Horario(Set<DiadaSemana> dias, Set<Hora> horas) {
-        this.dias = dias;
-        this.horas = horas;
     }
 
     public Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodificado) {
