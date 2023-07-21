@@ -4,11 +4,7 @@ import com.hunter104.model.Disciplina;
 import com.hunter104.model.Turma;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class TurmasTableModel extends AbstractTableModel {
     private static final int COL_DISCIPLINA = 0;
@@ -72,6 +68,37 @@ public class TurmasTableModel extends AbstractTableModel {
             }
         }
         return null;
+    }
+
+    public Turma getTurma(int row) {
+        int linhaAtual = 0;
+        for (Disciplina disciplina : disciplinas) {
+            for (Turma turma : disciplina.getTurmasOrdemId()) {
+                if (linhaAtual == row) {
+                    return turma;
+                }
+                linhaAtual++;
+            }
+        }
+        return null;
+    }
+
+    public Disciplina getDisciplina(int row) {
+        int linhaAtual = 0;
+        for (Disciplina disciplina : disciplinas) {
+            for (Turma ignored : disciplina.getTurmasOrdemId()) {
+                if (linhaAtual == row) {
+                    return disciplina;
+                }
+                linhaAtual++;
+            }
+        }
+        return null;
+    }
+
+    public void setDisciplinas(List<Disciplina> disciplinas) {
+        this.disciplinas = disciplinas;
+        fireTableDataChanged();
     }
 
 /*    @Override

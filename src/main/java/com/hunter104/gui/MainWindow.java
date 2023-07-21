@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Comparator;
 import java.util.List;
 
 import static com.hunter104.Main.criarPlanejadorComDados;
@@ -34,7 +33,7 @@ public class MainWindow implements PropertyChangeListener {
     private JLabel chHorasLabel;
     private JLabel informacoesLabel;
     private final DisciplinasTableModel crudDisciplinasModel;
-    private final TurmasTableModel turmasTableModel;
+    private final TurmasTableModel crudTurmasModel;
     private final PlanejadorGradeHoraria planejador;
 
     public MainWindow() {
@@ -47,13 +46,14 @@ public class MainWindow implements PropertyChangeListener {
         crudDisciplinasModel = new DisciplinasTableModel(planejador.getDisciplinasOrdemAlfabetica());
         disciplinasCrudTable.setModel(crudDisciplinasModel);
 
-        turmasTableModel = new TurmasTableModel(planejador.getDisciplinasOrdemAlfabetica());
-        turmasCrudTable.setModel(turmasTableModel);
+        crudTurmasModel = new TurmasTableModel(planejador.getDisciplinasOrdemAlfabetica());
+        turmasCrudTable.setModel(crudTurmasModel);
 
 
         // Botões
         adicionarDisciplinaButton.addActionListener(e -> {
             AdicionarDisciplina dialog = new AdicionarDisciplina(planejador);
+            dialog.setTitle("Cadastrar nova disciplina");
             dialog.pack();
             dialog.setVisible(true);
         });
@@ -64,6 +64,19 @@ public class MainWindow implements PropertyChangeListener {
         // Labels
         chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
         informacoesLabel.putClientProperty("FlatLaf.styleClass", "h1");
+        adicionarTurmaButton.addActionListener(e -> {
+            AdicionarTurma dialog = new AdicionarTurma(planejador);
+            dialog.setTitle("Cadastrar nova turma");
+            dialog.pack();
+            dialog.setVisible(true);
+        });
+        //TODO: deixar crud de turmas mais limpo
+        removerTurmaButton.addActionListener(e -> {
+            int row = turmasCrudTable.getSelectedRow();
+            Disciplina d = crudTurmasModel.getDisciplina(row);
+            int id = crudTurmasModel.getTurma(row).getId();
+            planejador.removerTurma(d.getNome(), id);
+        });
     }
 
     public static void main(String[] args) {
@@ -82,7 +95,9 @@ public class MainWindow implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("disciplinas".equals(evt.getPropertyName())) {
-            crudDisciplinasModel.setLinhas(planejador.getDisciplinasOrdemAlfabetica());
+            List<Disciplina> novasDisciplinas = planejador.getDisciplinasOrdemAlfabetica();
+            crudDisciplinasModel.setLinhas(novasDisciplinas);
+            crudTurmasModel.setDisciplinas(novasDisciplinas);
             chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
         }
     }

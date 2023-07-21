@@ -66,15 +66,42 @@ public class PlanejadorGradeHoraria {
         return disciplinas.stream().filter(disciplina -> disciplina.getNome().equals(nome)).findFirst().orElseThrow();
     }
 
+    //TODO: colocar um método própio pra observar mudanças em turmas
     public void adicionarTurma(String nomeDisciplina, int id, String professor, String horarioCodificado) {
         Turma turma = new Turma(id, professor, horarioCodificado);
+
+        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
+        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+
         getDisciplina(nomeDisciplina).adicionarTurma(turma);
         atualizarConflitos();
+
+        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
+        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+    }
+
+    public void adicionarTurma(String nomeDisciplina, int id, String professor, String salas, String horarioCodificado) {
+        Turma turma = new Turma(id, professor, salas, horarioCodificado);
+
+        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
+        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+
+        getDisciplina(nomeDisciplina).adicionarTurma(turma);
+        atualizarConflitos();
+
+        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
+        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
     public void removerTurma(String nomeDisciplina, int id) {
+        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
+        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+
         getDisciplina(nomeDisciplina).removerTurma(id);
         atualizarConflitos();
+
+        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
+        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
     public Turma getTurma(String nomeDisciplina, int id) {
