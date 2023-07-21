@@ -12,12 +12,12 @@ public class Main {
     public static PlanejadorGradeHoraria criarPlanejadorComDados() {
         PlanejadorGradeHoraria planejador = new PlanejadorGradeHoraria();
 
-        planejador.adicionarDisciplina("MATEMÁTICA DISCRETA 2", 60);
+        planejador.adicionarDisciplina("FGA0108","MATEMÁTICA DISCRETA 2","MD2", 60);
         planejador.adicionarTurma("MATEMÁTICA DISCRETA 2",
                 1, "MATHEUS BERNARDINI DE SOUZA", "26T23");
 
 
-        planejador.adicionarDisciplina("MÉTODOS DE DESENVOLVIMENTO DE SOFTWARE", 60);
+        planejador.adicionarDisciplina("FGA0138","MÉTODOS DE DESENVOLVIMENTO DE SOFTWARE","MDS", 60);
         planejador.adicionarTurma("MÉTODOS DE DESENVOLVIMENTO DE SOFTWARE",
                 1, "HILMER RODRIGUES NER", "35T45");
         planejador.adicionarTurma("MÉTODOS DE DESENVOLVIMENTO DE SOFTWARE",
@@ -27,7 +27,7 @@ public class Main {
         planejador.adicionarTurma("MÉTODOS DE DESENVOLVIMENTO DE SOFTWARE",
                 4, "RICARDO AJAX DIAS KOSLOSKI", "24T23");
 
-        planejador.adicionarDisciplina("PROJETO INTEGRADOR DE ENGENHARIA 1", 60);
+        planejador.adicionarDisciplina("FGA0150", "PROJETO INTEGRADOR DE ENGENHARIA 1","PI", 60);
         planejador.adicionarTurma("PROJETO INTEGRADOR DE ENGENHARIA 1",
                 4, "DIOGO CAETANO GARCIA", "24T45");
         planejador.adicionarTurma("PROJETO INTEGRADOR DE ENGENHARIA 1",
@@ -40,14 +40,14 @@ public class Main {
                 8, "RICARDO AJAX DIAS KOSLOSKI", "24T45");
 
 
-        planejador.adicionarDisciplina("FUNDAMENTOS DE ARQUITETURA DE COMPUTADORES", 60);
+        planejador.adicionarDisciplina("FGA0142", "FUNDAMENTOS DE ARQUITETURA DE COMPUTADORES","FAC", 60);
         planejador.adicionarTurma("FUNDAMENTOS DE ARQUITETURA DE COMPUTADORES",
                 1, "TIAGO ALVES DA FONSECA", "24M34");
         planejador.adicionarTurma("FUNDAMENTOS DE ARQUITETURA DE COMPUTADORES",
                 2, "JOHN LENON CARDOSO GARDENGHI", "46T45");
 
 
-        planejador.adicionarDisciplina("ESTRUTURAS DE DADOS E ALGORITMOS", 60);
+        planejador.adicionarDisciplina("FGA0147", "ESTRUTURAS DE DADOS E ALGORITMOS","EDA", 60);
         planejador.adicionarTurma("ESTRUTURAS DE DADOS E ALGORITMOS",
                 1, "NILTON CORREIA DA SILVA", "35M34");
         planejador.adicionarTurma("ESTRUTURAS DE DADOS E ALGORITMOS",
@@ -55,7 +55,7 @@ public class Main {
         planejador.adicionarTurma("ESTRUTURAS DE DADOS E ALGORITMOS",
                 3, "ROSE YURI SHIMIZU", "35M34");
 
-        planejador.adicionarDisciplina("GESTAO DE PRODUCAO E QUALIDADE", 60);
+        planejador.adicionarDisciplina("FGA0184","GESTAO DE PRODUCAO E QUALIDADE","GPQ", 60);
         planejador.adicionarTurma("GESTAO DE PRODUCAO E QUALIDADE",
                 1, "REJANE MARIA DA COSTA FIGUEIREIDO", "35T23");
         planejador.adicionarTurma("GESTAO DE PRODUCAO E QUALIDADE",
