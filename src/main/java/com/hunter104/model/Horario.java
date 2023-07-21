@@ -10,9 +10,10 @@ import java.util.stream.Collectors;
 public class Horario {
     private Set<Hora> horas;
     private Set<DiadaSemana> dias;
+    private String horarioCodificado;
 
     public Horario(String horarioCodificado) {
-
+        this.horarioCodificado = horarioCodificado;
         Pattern pattern = Pattern.compile("(\\d+)(\\w)(\\d+)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(horarioCodificado);
 
@@ -73,5 +74,9 @@ public class Horario {
 
     public Set<DiadaSemana> getDias() {
         return dias;
+    }
+
+    public String getHorarioCodificado() {
+        return horarioCodificado;
     }
 }
