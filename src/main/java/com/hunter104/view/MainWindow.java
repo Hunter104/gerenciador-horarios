@@ -9,6 +9,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Objects;
+import java.util.Observable;
+import java.util.Observer;
 
 import static com.hunter104.Main.criarPlanejadorComDados;
 
@@ -62,23 +64,23 @@ public class MainWindow implements PropertyChangeListener {
         removerDisciplinaButton.addActionListener(e -> planejador.removerDisciplina(
                 crudDisciplinasModel.getDisciplina(disciplinasCrudTable.getSelectedRow()).getNome()
         ));
-
-        // Labels
-        chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
-        disciplinasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
         adicionarTurmaButton.addActionListener(e -> {
             AdicionarTurma dialog = new AdicionarTurma(planejador);
             dialog.setTitle("Cadastrar nova turma");
             dialog.pack();
             dialog.setVisible(true);
         });
-        //TODO: deixar crud de turmas mais limpo
         removerTurmaButton.addActionListener(e -> {
             int row = turmasCrudTable.getSelectedRow();
             Disciplina d = crudTurmasModel.getDisciplina(row);
             int id = crudTurmasModel.getTurma(row).getId();
             d.removerTurma(id);
         });
+        // Labels
+        chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
+        disciplinasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
+        turmasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
+
     }
 
     public static void main(String[] args) {

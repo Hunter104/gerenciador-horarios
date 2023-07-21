@@ -53,7 +53,7 @@ public class TurmasTableModel extends AbstractTableModel {
     public Object getValueAt(int row, int column) {
         int linhaAtual = 0;
         for (Disciplina disciplina : disciplinas) {
-            for (Turma turma : disciplina.getTurmasOrdemId()) {
+            for (Turma turma : disciplina.getTurmasPorId()) {
                 if (linhaAtual == row) {
                     return switch (column) {
                         case COL_DISCIPLINA -> disciplina.getNome();
@@ -73,7 +73,7 @@ public class TurmasTableModel extends AbstractTableModel {
     public Turma getTurma(int row) {
         int linhaAtual = 0;
         for (Disciplina disciplina : disciplinas) {
-            for (Turma turma : disciplina.getTurmasOrdemId()) {
+            for (Turma turma : disciplina.getTurmasPorId()) {
                 if (linhaAtual == row) {
                     return turma;
                 }
@@ -86,7 +86,7 @@ public class TurmasTableModel extends AbstractTableModel {
     public Disciplina getDisciplina(int row) {
         int linhaAtual = 0;
         for (Disciplina disciplina : disciplinas) {
-            for (Turma ignored : disciplina.getTurmasOrdemId()) {
+            for (Turma ignored : disciplina.getTurmasPorId()) {
                 if (linhaAtual == row) {
                     return disciplina;
                 }
