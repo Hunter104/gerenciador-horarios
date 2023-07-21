@@ -35,7 +35,7 @@ public class DisciplinasTableModel extends AbstractTableModel {
     }
 
     @Override
-    public Class getColumnClass(int columnIndex) {
+    public Class<?> getColumnClass(int columnIndex) {
         if (columnIndex == COL_CARGA_HORARIA) {
             return Integer.class;
         }

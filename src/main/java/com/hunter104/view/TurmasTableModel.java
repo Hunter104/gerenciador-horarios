@@ -36,7 +36,7 @@ public class TurmasTableModel extends AbstractTableModel {
     }
 
     @Override
-    public Class getColumnClass(int columnIndex) {
+    public Class<?> getColumnClass(int columnIndex) {
         if (columnIndex == COL_ID) {
             return Integer.class;
         }
@@ -104,19 +104,4 @@ public class TurmasTableModel extends AbstractTableModel {
     public void atualizarDados() {
         fireTableDataChanged();
     }
-
-/*    @Override
-    public void setValueAt(Object aValue, int row,
-                           int column) {
-        Disciplina d = linhas.get(row);
-        if (column == COL_NOME) {
-            d.setNome(aValue.toString());
-        } else if (column == COL_ABREVIACAO) {
-            d.setAbreviacao(aValue.toString());
-        } else if (column == COL_CODIGO) {
-            d.setCodigo(aValue.toString());
-        } else if (column == COL_CARGA_HORARIA) {
-            d.setCargaHoraria((Integer) aValue);
-        }
-    }*/
 }
