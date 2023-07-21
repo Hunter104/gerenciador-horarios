@@ -1,9 +1,6 @@
 package com.hunter104.model;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class Disciplina {
     private String nome;
@@ -118,6 +115,9 @@ public class Disciplina {
 
     public Set<Turma> getTurmas() {
         return turmas;
+    }
+    public List<Turma> getTurmasOrdemId() {
+        return turmas.stream().sorted(Comparator.comparing(Turma::getId)).toList();
     }
 
     public void setTurmas(Set<Turma> turmas) {
