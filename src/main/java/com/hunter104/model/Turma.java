@@ -22,18 +22,11 @@ public class Turma {
         this.salas = salas;
     }
 
-    @Deprecated
-    public Turma(int id, String professor, String horarioCodificado) {
-        this.id = id;
-        this.professor = professor;
-        this.horario = new Horario(horarioCodificado);
-    }
-
     public Turma(int id, String professor, String salas, String horarioCodificado) {
         this.id = id;
         this.professor = professor;
         this.salas = salas;
-        this.horario = new Horario(horarioCodificado);
+        this.horario = Horario.criarFromCodigo(horarioCodificado);
     }
 
     @Override
