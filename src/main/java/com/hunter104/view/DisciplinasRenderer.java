@@ -1,11 +1,9 @@
-package com.hunter104.gui;
+package com.hunter104.view;
 
 import com.hunter104.model.Disciplina;
 
 import javax.swing.*;
-import javax.swing.event.ListDataListener;
 import java.awt.*;
-import java.util.List;
 
 public class DisciplinasRenderer extends DefaultListCellRenderer  {
     @Override

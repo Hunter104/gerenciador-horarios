@@ -1,12 +1,10 @@
-package com.hunter104.gui;
+package com.hunter104.view;
 
 import com.hunter104.model.Disciplina;
 import com.hunter104.model.PlanejadorGradeHoraria;
 
 import javax.swing.*;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.hunter104.gui;
+package com.hunter104.view;
 
 import javax.swing.*;
 import java.awt.event.*;
