@@ -67,6 +67,7 @@ public class PlanejadorGradeHoraria {
     }
 
     //TODO: colocar um método própio pra observar mudanças em turmas
+    @Deprecated
     public void adicionarTurma(String nomeDisciplina, int id, String professor, String horarioCodificado) {
         Turma turma = new Turma(id, professor, horarioCodificado);
 
@@ -80,6 +81,7 @@ public class PlanejadorGradeHoraria {
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
+    @Deprecated
     public void adicionarTurma(String nomeDisciplina, int id, String professor, String salas, String horarioCodificado) {
         Turma turma = new Turma(id, professor, salas, horarioCodificado);
 
@@ -93,6 +95,7 @@ public class PlanejadorGradeHoraria {
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
+    @Deprecated
     public void removerTurma(String nomeDisciplina, int id) {
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
@@ -104,6 +107,7 @@ public class PlanejadorGradeHoraria {
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
+    @Deprecated
     public Turma getTurma(String nomeDisciplina, int id) {
         return getDisciplina(nomeDisciplina).getTurma(id);
     }

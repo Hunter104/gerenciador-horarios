@@ -8,11 +8,13 @@ public class Turma {
     private Horario horario;
     private String salas;
 
+    @Deprecated
     public Turma(int id, String professor, Horario horario) {
         this.id = id;
         this.professor = professor;
         this.horario = horario;
     }
+
     public Turma(int id, String professor, String salas, Horario horario) {
         this.id = id;
         this.professor = professor;
@@ -20,6 +22,7 @@ public class Turma {
         this.salas = salas;
     }
 
+    @Deprecated
     public Turma(int id, String professor, String horarioCodificado) {
         this.id = id;
         this.professor = professor;
