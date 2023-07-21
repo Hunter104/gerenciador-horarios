@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import java.util.Objects;
 
 import static com.hunter104.Main.criarPlanejadorComDados;
 
@@ -39,6 +40,8 @@ public class MainWindow implements PropertyChangeListener {
         // Modelo
         planejador = criarPlanejadorComDados();
         planejador.addPropertyChangeListener(this);
+
+        planejador.getDisciplinas().forEach(disciplina -> disciplina.addPropertyChangeListener(this));
 
         // Tabelas
         crudDisciplinasModel = new DisciplinasTableModel(planejador.getDisciplinasOrdemAlfabetica());
@@ -92,11 +95,18 @@ public class MainWindow implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if ("disciplinas".equals(evt.getPropertyName())) {
+        if (Objects.equals(evt.getPropertyName(), "disciplinas")) {
+            // Cadastrar observadores para as novas disciplinas
+            planejador.getDisciplinas().forEach(disciplina -> disciplina.addPropertyChangeListener(this));
+
             List<Disciplina> novasDisciplinas = planejador.getDisciplinasOrdemAlfabetica();
+
             crudDisciplinasModel.setLinhas(novasDisciplinas);
             crudTurmasModel.setDisciplinas(novasDisciplinas);
+
             chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
+        } else if (Objects.equals(evt.getPropertyName(), "turmas")) {
+            crudTurmasModel.atualizarDados();
         }
     }
 }

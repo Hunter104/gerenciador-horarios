@@ -101,6 +101,10 @@ public class TurmasTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
+    public void atualizarDados() {
+        fireTableDataChanged();
+    }
+
 /*    @Override
     public void setValueAt(Object aValue, int row,
                            int column) {

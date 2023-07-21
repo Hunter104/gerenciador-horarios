@@ -1,5 +1,7 @@
 package com.hunter104.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.*;
 
 public class Disciplina {
@@ -8,19 +10,31 @@ public class Disciplina {
     private Set<Turma> turmas;
     private String abreviacao;
     private String codigo;
+    private final PropertyChangeSupport support;
 
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        support.addPropertyChangeListener(pcl);
+    }
 
+    public void removePropertyChangeListener(PropertyChangeListener pcl) {
+        support.removePropertyChangeListener(pcl);
+    }
+
+    @Deprecated
     public Disciplina(String nome, int cargaHoraria) {
         this.nome = nome;
         this.cargaHoraria = cargaHoraria;
         this.turmas = new HashSet<>();
+        support = new PropertyChangeSupport(this);
     }
 
+    @Deprecated
     public Disciplina(String nome, String abreviacao, int cargaHoraria) {
         this.abreviacao = abreviacao;
         this.nome = nome;
         this.cargaHoraria = cargaHoraria;
         this.turmas = new HashSet<>();
+        support = new PropertyChangeSupport(this);
     }
 
     public Disciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
@@ -29,24 +43,36 @@ public class Disciplina {
         this.nome = nome;
         this.cargaHoraria = cargaHoraria;
         this.turmas = new HashSet<>();
+        support = new PropertyChangeSupport(this);
     }
 
-    public void adicionarTurma(int id, String professor, String horarioCodificado) {
-        Turma turma = new Turma(id, professor, horarioCodificado);
+    public void adicionarTurma(int id, String professor, String salas, String horarioCodificado) {
+        Turma turma = new Turma(id, professor, salas, horarioCodificado);
+
+        Set<Turma> turmasAntigas = new HashSet<>(turmas);
         turmas.add(turma);
+        support.firePropertyChange("turmas", turmasAntigas, turmas);
     }
 
+    @Deprecated
     public void adicionarTurma(int id, String professor, Horario horario) {
         Turma turma = new Turma(id, professor, horario);
+
+        Set<Turma> turmasAntigas = new HashSet<>(turmas);
         turmas.add(turma);
+        support.firePropertyChange("turmas", turmasAntigas, turmas);
     }
 
     public void adicionarTurma(Turma turma) {
+        Set<Turma> turmasAntigas = new HashSet<>(turmas);
         turmas.add(turma);
+        support.firePropertyChange("turmas", turmasAntigas, turmas);
     }
 
     public void removerTurma(int id) {
+        Set<Turma> turmasAntigas = new HashSet<>(turmas);
         turmas.removeIf(turma -> turma.getId() == id);
+        support.firePropertyChange("turmas", turmasAntigas, turmas);
     }
 
     public Turma getTurma(int id) {

@@ -2,6 +2,7 @@ package com.hunter104.view;
 
 import com.hunter104.model.Disciplina;
 import com.hunter104.model.PlanejadorGradeHoraria;
+import com.hunter104.model.Turma;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -13,7 +14,7 @@ public class AdicionarTurma extends JDialog {
     private JButton buttonCancel;
     private JTextField idField;
     private JTextField professorField;
-    private JComboBox<String> disciplinaBox;
+    private JComboBox<Disciplina> disciplinaBox;
     private JTextField horarioField;
     private JTextField salaField;
     private final PlanejadorGradeHoraria planejador;
@@ -23,7 +24,7 @@ public class AdicionarTurma extends JDialog {
 
         disciplinaBox.setRenderer(new DisciplinasRenderer());
         List<Disciplina> disciplinas = planejador.getDisciplinasOrdemAlfabetica();
-        disciplinas.forEach(disciplina -> disciplinaBox.addItem(disciplina.getNome()));
+        disciplinas.forEach(disciplina -> disciplinaBox.addItem(disciplina));
 
         setContentPane(contentPane);
         setModal(true);
@@ -46,9 +47,9 @@ public class AdicionarTurma extends JDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK() {
-        planejador.adicionarTurma(
-                (String) disciplinaBox.getSelectedItem(),
+    private void onOK() {;
+        Disciplina disciplinaEscolhida = (Disciplina) disciplinaBox.getSelectedItem();
+        disciplinaEscolhida.adicionarTurma(
                 Integer.parseInt(idField.getText()),
                 professorField.getText(),
                 salaField.getText(),
