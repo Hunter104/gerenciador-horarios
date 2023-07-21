@@ -45,14 +45,6 @@ public class Disciplina {
         support.firePropertyChange("turmas", turmasAntigas, turmas);
     }
 
-    @Deprecated
-    public void adicionarTurma(int id, String professor, Horario horario) {
-        Turma turma = new Turma(id, professor, horario);
-
-        Set<Turma> turmasAntigas = new HashSet<>(turmas);
-        turmas.add(turma);
-        support.firePropertyChange("turmas", turmasAntigas, turmas);
-    }
 
     public void adicionarTurma(Turma turma) {
         Set<Turma> turmasAntigas = new HashSet<>(turmas);
@@ -63,6 +55,12 @@ public class Disciplina {
     public void removerTurma(int id) {
         Set<Turma> turmasAntigas = new HashSet<>(turmas);
         turmas.removeIf(turma -> turma.getId() == id);
+        support.firePropertyChange("turmas", turmasAntigas, turmas);
+    }
+
+    public void removerTurma(Turma t) {
+        Set<Turma> turmasAntigas = new HashSet<>(turmas);
+        turmas.remove(t);
         support.firePropertyChange("turmas", turmasAntigas, turmas);
     }
 
@@ -90,6 +88,10 @@ public class Disciplina {
             }
         }
         return true;
+    }
+
+    public List<Turma> getTurmasPorId() {
+        return turmas.stream().sorted(Comparator.comparing(Turma::getId)).toList();
     }
 
     @Override
@@ -129,12 +131,8 @@ public class Disciplina {
     public void setCargaHoraria(int cargaHoraria) {
         this.cargaHoraria = cargaHoraria;
     }
-
     public Set<Turma> getTurmas() {
         return turmas;
-    }
-    public List<Turma> getTurmasOrdemId() {
-        return turmas.stream().sorted(Comparator.comparing(Turma::getId)).toList();
     }
 
     public void setTurmas(Set<Turma> turmas) {
