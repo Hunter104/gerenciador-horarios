@@ -27,10 +27,11 @@ public class MainWindow implements PropertyChangeListener {
     private JTable turmasPossiveisTable;
     private JTable turmasEscolhidasTable;
     private JButton escolherTurmaButton;
-    private JButton removerTurmaButton1;
+    private JButton removerTurmaButton2;
     private JButton exportarDadosButton;
     private JLabel chHorasLabel;
-    private JLabel informacoesLabel;
+    private JLabel disciplinasTituloLabel;
+    private JLabel turmasTituloLabel;
     private final DisciplinasTableModel crudDisciplinasModel;
     private final TurmasTableModel crudTurmasModel;
     private final PlanejadorGradeHoraria planejador;
@@ -64,7 +65,7 @@ public class MainWindow implements PropertyChangeListener {
 
         // Labels
         chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
-        informacoesLabel.putClientProperty("FlatLaf.styleClass", "h1");
+        disciplinasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
         adicionarTurmaButton.addActionListener(e -> {
             AdicionarTurma dialog = new AdicionarTurma(planejador);
             dialog.setTitle("Cadastrar nova turma");

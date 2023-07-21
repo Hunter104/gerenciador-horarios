@@ -34,7 +34,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="OK"/>
+                  <text value="&amp;OK"/>
                 </properties>
               </component>
               <component id="5723f" class="javax.swing.JButton" binding="buttonCancel">
@@ -42,7 +42,7 @@
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Cancel"/>
+                  <text value="&amp;Cancel"/>
                 </properties>
               </component>
             </children>
@@ -62,7 +62,8 @@
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Número de id:"/>
+              <labelFor value="f40f8"/>
+              <text value="&amp;Número de id:"/>
             </properties>
           </component>
           <vspacer id="eab51">
@@ -83,7 +84,8 @@
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Professor:"/>
+              <labelFor value="4ecf2"/>
+              <text value="&amp;Professor:"/>
             </properties>
           </component>
           <component id="4ecf2" class="javax.swing.JTextField" binding="professorField">
@@ -99,7 +101,8 @@
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Código do horário:"/>
+              <labelFor value="797a7"/>
+              <text value="Código do &amp;horário:"/>
             </properties>
           </component>
           <component id="2781b" class="javax.swing.JLabel">
@@ -107,7 +110,8 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Disciplina:"/>
+              <labelFor value="6b43"/>
+              <text value="&amp;Disciplina:"/>
             </properties>
           </component>
           <component id="6b43" class="javax.swing.JComboBox" binding="disciplinaBox">
@@ -131,7 +135,8 @@
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Sala(s)"/>
+              <labelFor value="4220d"/>
+              <text value="&amp;Sala(s)"/>
             </properties>
           </component>
           <component id="4220d" class="javax.swing.JTextField" binding="salaField">

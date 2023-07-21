@@ -7,7 +7,7 @@ public class ExportarFormato extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JComboBox<String> comboBox1;
+    private JComboBox<String> formatoComboBox;
 
     public ExportarFormato() {
         setContentPane(contentPane);
