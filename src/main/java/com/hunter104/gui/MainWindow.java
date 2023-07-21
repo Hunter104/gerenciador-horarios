@@ -31,15 +31,27 @@ public class MainWindow implements PropertyChangeListener {
     private JButton escolherTurmaButton;
     private JButton removerTurmaButton1;
     private JButton exportarDadosButton;
+    private JLabel chHorasLabel;
+    private JLabel informacoesLabel;
     private final DisciplinasTableModel crudDisciplinasModel;
-
+    private final TurmasTableModel turmasTableModel;
     private final PlanejadorGradeHoraria planejador;
 
     public MainWindow() {
+
+        // Modelo
         planejador = criarPlanejadorComDados();
         planejador.addPropertyChangeListener(this);
-        crudDisciplinasModel = new DisciplinasTableModel(planejador.getDisciplinas().stream().toList());
+
+        // Tabelas
+        crudDisciplinasModel = new DisciplinasTableModel(planejador.getDisciplinasOrdemAlfabetica());
         disciplinasCrudTable.setModel(crudDisciplinasModel);
+
+        turmasTableModel = new TurmasTableModel(planejador.getDisciplinasOrdemAlfabetica());
+        turmasCrudTable.setModel(turmasTableModel);
+
+
+        // Botões
         adicionarDisciplinaButton.addActionListener(e -> {
             AdicionarDisciplina dialog = new AdicionarDisciplina(planejador);
             dialog.pack();
@@ -48,6 +60,10 @@ public class MainWindow implements PropertyChangeListener {
         removerDisciplinaButton.addActionListener(e -> planejador.removerDisciplina(
                 crudDisciplinasModel.getDisciplina(disciplinasCrudTable.getSelectedRow()).getNome()
         ));
+
+        // Labels
+        chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
+        informacoesLabel.putClientProperty("FlatLaf.styleClass", "h1");
     }
 
     public static void main(String[] args) {
@@ -66,11 +82,8 @@ public class MainWindow implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("disciplinas".equals(evt.getPropertyName())) {
-            List<Disciplina> disciplinasOrdenadas = planejador
-                            .getDisciplinas()
-                            .stream()
-                            .sorted(Comparator.comparing(Disciplina::getNome)).toList();
-            crudDisciplinasModel.setLinhas(disciplinasOrdenadas);
+            crudDisciplinasModel.setLinhas(planejador.getDisciplinasOrdemAlfabetica());
+            chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
         }
     }
 }
