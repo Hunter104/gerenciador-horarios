@@ -3,10 +3,8 @@ package com.hunter104.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.PipedOutputStream;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PlanejadorGradeHoraria {
     private final Set<Disciplina> disciplinas;
@@ -160,6 +158,16 @@ public class PlanejadorGradeHoraria {
         conflitos = ConflitoHorario.checarPorConflitos(disciplinas);
     }
 
+    public int getCargaHorariaTotalHoras() {
+        return disciplinas.stream().map(Disciplina::getCargaHoraria).mapToInt(Integer::intValue).sum();
+    }
+
+    public int getCargaHorariaTotalCreditos() {
+        int cargaHoras = disciplinas.stream().map(Disciplina::getCargaHoraria).mapToInt(Integer::intValue).sum();
+        return (cargaHoras/15);
+    }
+
+
     @Override
     public String toString() {
         return "GradeHoraria{" +
@@ -183,6 +191,10 @@ public class PlanejadorGradeHoraria {
 
     public Set<Disciplina> getDisciplinas() {
         return disciplinas;
+    }
+
+    public List<Disciplina> getDisciplinasOrdemAlfabetica() {
+        return disciplinas.stream().sorted(Comparator.comparing(Disciplina::getNome)).toList();
     }
 
     public Set<ConflitoHorario> getConflitos() {
