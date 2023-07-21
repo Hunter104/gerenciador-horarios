@@ -20,23 +20,6 @@ public class Disciplina {
         support.removePropertyChangeListener(pcl);
     }
 
-    @Deprecated
-    public Disciplina(String nome, int cargaHoraria) {
-        this.nome = nome;
-        this.cargaHoraria = cargaHoraria;
-        this.turmas = new HashSet<>();
-        support = new PropertyChangeSupport(this);
-    }
-
-    @Deprecated
-    public Disciplina(String nome, String abreviacao, int cargaHoraria) {
-        this.abreviacao = abreviacao;
-        this.nome = nome;
-        this.cargaHoraria = cargaHoraria;
-        this.turmas = new HashSet<>();
-        support = new PropertyChangeSupport(this);
-    }
-
     public Disciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
         this.codigo = codigo;
         this.abreviacao = abreviacao;
@@ -48,6 +31,14 @@ public class Disciplina {
 
     public void adicionarTurma(int id, String professor, String salas, String horarioCodificado) {
         Turma turma = new Turma(id, professor, salas, horarioCodificado);
+
+        Set<Turma> turmasAntigas = new HashSet<>(turmas);
+        turmas.add(turma);
+        support.firePropertyChange("turmas", turmasAntigas, turmas);
+    }
+
+    public void adicionarTurma(int id, String professor, String salas, Horario horario) {
+        Turma turma = new Turma(id, professor, salas, horario);
 
         Set<Turma> turmasAntigas = new HashSet<>(turmas);
         turmas.add(turma);

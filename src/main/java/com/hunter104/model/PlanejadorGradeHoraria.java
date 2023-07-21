@@ -2,9 +2,7 @@ package com.hunter104.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.PipedOutputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PlanejadorGradeHoraria {
     private final Set<Disciplina> disciplinas;
@@ -25,8 +23,8 @@ public class PlanejadorGradeHoraria {
         support.removePropertyChangeListener(pcl);
     }
 
-    public void adicionarDisciplina(String nome, int cargaHoraria) {
-        Disciplina disciplina = new Disciplina(nome, cargaHoraria);
+    public void adicionarDisciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
+        Disciplina disciplina = new Disciplina(codigo, nome, abreviacao,cargaHoraria);
 
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
@@ -38,13 +36,11 @@ public class PlanejadorGradeHoraria {
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
-    public void adicionarDisciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
-        Disciplina disciplina = new Disciplina(codigo, nome, abreviacao,cargaHoraria);
-
+    public void adicionarDisciplina(Disciplina d) {
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
 
-        disciplinas.add(disciplina);
+        disciplinas.add(d);
         atualizarConflitos();
 
         support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
@@ -64,52 +60,6 @@ public class PlanejadorGradeHoraria {
 
     public Disciplina getDisciplina(String nome) {
         return disciplinas.stream().filter(disciplina -> disciplina.getNome().equals(nome)).findFirst().orElseThrow();
-    }
-
-    //TODO: colocar um método própio pra observar mudanças em turmas
-    @Deprecated
-    public void adicionarTurma(String nomeDisciplina, int id, String professor, String horarioCodificado) {
-        Turma turma = new Turma(id, professor, horarioCodificado);
-
-        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
-        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
-
-        getDisciplina(nomeDisciplina).adicionarTurma(turma);
-        atualizarConflitos();
-
-        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
-        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
-    }
-
-    @Deprecated
-    public void adicionarTurma(String nomeDisciplina, int id, String professor, String salas, String horarioCodificado) {
-        Turma turma = new Turma(id, professor, salas, horarioCodificado);
-
-        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
-        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
-
-        getDisciplina(nomeDisciplina).adicionarTurma(turma);
-        atualizarConflitos();
-
-        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
-        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
-    }
-
-    @Deprecated
-    public void removerTurma(String nomeDisciplina, int id) {
-        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
-        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
-
-        getDisciplina(nomeDisciplina).removerTurma(id);
-        atualizarConflitos();
-
-        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
-        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
-    }
-
-    @Deprecated
-    public Turma getTurma(String nomeDisciplina, int id) {
-        return getDisciplina(nomeDisciplina).getTurma(id);
     }
 
     public boolean existemDisciplinasInalcancaveis() {
@@ -172,12 +122,14 @@ public class PlanejadorGradeHoraria {
             Disciplina disciplinaAtual = turmaEntry.getKey();
             Turma turmaAtual = disciplinaAtual.getTurma(turmaEntry.getValue());
             Disciplina disciplinaCopiada = new Disciplina(
+                    disciplinaAtual.getCodigo(),
                     disciplinaAtual.getNome(),
                     disciplinaAtual.getAbreviacao(),
                     disciplinaAtual.getCargaHoraria());
             disciplinaCopiada.adicionarTurma(
                     turmaAtual.getId(),
                     turmaAtual.getProfessor(),
+                    turmaAtual.getSalas(),
                     turmaAtual.getHorario()
             );
             disciplinas.add(disciplinaCopiada);

@@ -76,7 +76,7 @@ public class MainWindow implements PropertyChangeListener {
             int row = turmasCrudTable.getSelectedRow();
             Disciplina d = crudTurmasModel.getDisciplina(row);
             int id = crudTurmasModel.getTurma(row).getId();
-            planejador.removerTurma(d.getNome(), id);
+            d.removerTurma(id);
         });
     }
 
