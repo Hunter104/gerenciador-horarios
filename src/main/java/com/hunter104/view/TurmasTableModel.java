@@ -1,9 +1,14 @@
 package com.hunter104.view;
 
 import com.hunter104.model.Disciplina;
+import com.hunter104.model.Horario;
 import com.hunter104.model.Turma;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
+import java.awt.*;
 import java.util.List;
 
 public class TurmasTableModel extends AbstractTableModel {
@@ -46,7 +51,7 @@ public class TurmasTableModel extends AbstractTableModel {
     @Override
     public boolean isCellEditable(int rowIndex, int
             columnIndex) {
-        return columnIndex != COL_DISCIPLINA;
+        return columnIndex != COL_DISCIPLINA && columnIndex != COL_HORARIO;
     }
 
     @Override
@@ -68,6 +73,24 @@ public class TurmasTableModel extends AbstractTableModel {
             }
         }
         return null;
+    }
+
+    @Override
+    public void setValueAt(Object aValue, int row,
+                             int column) {
+        int linhaAtual = 0;
+        for (Disciplina disciplina : disciplinas) {
+            for (Turma turma : disciplina.getTurmasPorId()) {
+                if (linhaAtual == row) {
+                    switch (column) {
+                        case COL_ID -> turma.setId((Integer) aValue);
+                        case COL_PROFESSOR -> turma.setProfessor((String) aValue);
+                        case COL_SALA -> turma.setSalas((String) aValue);
+                    }
+                }
+                linhaAtual++;
+            }
+        }
     }
 
     public Turma getTurma(int row) {
