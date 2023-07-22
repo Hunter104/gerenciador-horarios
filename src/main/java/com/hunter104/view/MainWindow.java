@@ -1,5 +1,6 @@
 package com.hunter104.view;
 
+import com.hunter104.model.ConflitoHorario;
 import com.hunter104.model.Disciplina;
 import com.hunter104.model.PlanejadorGradeHoraria;
 
@@ -9,9 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.hunter104.Main.criarPlanejadorComDados;
 
@@ -39,6 +38,7 @@ public class MainWindow implements PropertyChangeListener {
     private final TurmasTableModel crudTurmasModel;
     private final PlanejadorGradeHoraria planejador;
     private final ConflitosTableModel conflitosTableModel;
+    private final TurmasEspecificasTableModel turmasConflitoTableModel;
 
     public MainWindow() {
 
@@ -57,6 +57,9 @@ public class MainWindow implements PropertyChangeListener {
 
         conflitosTableModel = new ConflitosTableModel(planejador.getConflitos());
         horarioConflitoTable.setModel(conflitosTableModel);
+
+        turmasConflitoTableModel = new TurmasEspecificasTableModel(new HashMap<>());
+        turmasConflitoTable.setModel(turmasConflitoTableModel);
 
         // Botões
         adicionarDisciplinaButton.addActionListener(e -> {
@@ -79,6 +82,16 @@ public class MainWindow implements PropertyChangeListener {
             Disciplina d = crudTurmasModel.getDisciplina(row);
             int id = crudTurmasModel.getTurma(row).getId();
             d.removerTurma(id);
+        });
+        // TODO: trocar null checks por optionals
+        visualizarConflitoButton.addActionListener(e -> {
+            int row = horarioConflitoTable.getSelectedRow();
+            int column = horarioConflitoTable.getSelectedColumn();
+            Optional<ConflitoHorario> optionalConflito = conflitosTableModel.getConflito(row, column);
+            if (optionalConflito.isPresent()) {
+                ConflitoHorario conflito = optionalConflito.get();
+                turmasConflitoTableModel.setTurmas(conflito.turmas());
+            }
         });
         // Labels
         chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));

@@ -3,6 +3,7 @@ package com.hunter104.view;
 import com.hunter104.model.*;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.Optional;
 import java.util.Set;
 
 public class ConflitosTableModel extends AbstractTableModel {
@@ -45,6 +46,11 @@ public class ConflitosTableModel extends AbstractTableModel {
     }
 
     @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return false;
+    }
+
+    @Override
     public Object getValueAt(int row, int column) {
         if (column == COL_HORARIO) {
             return Hora.values()[row].getNome();
@@ -59,7 +65,7 @@ public class ConflitosTableModel extends AbstractTableModel {
         for (int colunaAtual = 1; colunaAtual-1 < dias.length; colunaAtual++) {
             for (int linhaAtual = 1; linhaAtual < horas.length; linhaAtual++) {
                 if (column == colunaAtual && row == linhaAtual) {
-                    return checarExisteConflitoNesseDia(dias[colunaAtual - 1], horas[linhaAtual]);
+                    return getConflito(row, column).isPresent();
                 }
             }
         }
@@ -71,7 +77,7 @@ public class ConflitosTableModel extends AbstractTableModel {
                 .stream().anyMatch(conflitoHorario -> conflitoHorario.dia() == dia && conflitoHorario.hora() == hora);
     }
 
-    public ConflitoHorario getConflito(int row, int column) {
+    public Optional<ConflitoHorario> getConflito(int row, int column) {
         DiadaSemana[] dias = DiadaSemana.values();
         Hora[] horas = Hora.values();
         for (int colunaAtual = 1; colunaAtual-1 < dias.length; colunaAtual++) {
@@ -82,11 +88,10 @@ public class ConflitosTableModel extends AbstractTableModel {
                     return conflitos
                             .stream()
                             .filter(conflitoHorario -> conflitoHorario.dia() == diaAtual && conflitoHorario.hora() == horaAtual)
-                            .findFirst()
-                            .orElseThrow();
+                            .findFirst();
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 }
