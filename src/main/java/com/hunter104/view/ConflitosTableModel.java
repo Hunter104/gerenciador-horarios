@@ -94,4 +94,9 @@ public class ConflitosTableModel extends AbstractTableModel {
         }
         return Optional.empty();
     }
+
+    public void setConflitos(Set<ConflitoHorario> conflitos) {
+        this.conflitos = conflitos;
+        fireTableDataChanged();
+    }
 }

@@ -98,6 +98,7 @@ public class MainWindow implements PropertyChangeListener {
         disciplinasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
         turmasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
 
+        otimizarButton.addActionListener(e -> planejador.removerTurmasInalcancaveis());
     }
 
     public static void main(String[] args) {
@@ -127,6 +128,8 @@ public class MainWindow implements PropertyChangeListener {
             chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
         } else if (Objects.equals(evt.getPropertyName(), "turmas")) {
             crudTurmasModel.atualizarDados();
+        } else if (Objects.equals(evt.getPropertyName(), "conflitos")) {
+            conflitosTableModel.setConflitos(planejador.getConflitos());
         }
     }
 }
