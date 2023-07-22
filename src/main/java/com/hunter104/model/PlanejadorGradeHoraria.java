@@ -8,6 +8,8 @@ public class PlanejadorGradeHoraria {
     private final Set<Disciplina> disciplinas;
     private Set<ConflitoHorario> conflitos;
     private final PropertyChangeSupport support;
+    private static final int ADICIONAR = 0;
+    private static final int REMOVER = 1;
 
     public PlanejadorGradeHoraria() {
         disciplinas = new HashSet<>();
@@ -24,35 +26,30 @@ public class PlanejadorGradeHoraria {
     }
 
     public void adicionarDisciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
-        Disciplina disciplina = new Disciplina(codigo, nome, abreviacao,cargaHoraria);
-
-        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
-        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
-
-        disciplinas.add(disciplina);
-        atualizarConflitos();
-
-        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
-        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+        adicionarDisciplina(new Disciplina(codigo, nome, abreviacao,cargaHoraria));
     }
 
-    public void adicionarDisciplina(Disciplina d) {
-        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
-        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
-
-        disciplinas.add(d);
-        atualizarConflitos();
-
-        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
-        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+    public void adicionarDisciplina(Disciplina disciplina) {
+        operareNotificar(disciplina, ADICIONAR);
     }
 
     public void removerDisciplina(String nome) {
+        removerDisciplina(getDisciplina(nome));
+    }
+
+    public void removerDisciplina(Disciplina disciplina) {
+        operareNotificar(disciplina, REMOVER);
+    }
+
+    private void operareNotificar(Disciplina disciplina, int operacao) {
+
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
 
-        disciplinas.removeIf(disciplina -> disciplina.getNome().equals(nome));
-        atualizarConflitos();
+        switch (operacao) {
+            case ADICIONAR -> disciplinas.add(disciplina);
+            case REMOVER -> disciplinas.remove(disciplina);
+        }
 
         support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
