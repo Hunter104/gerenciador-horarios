@@ -11,6 +11,8 @@ public class Disciplina {
     private String abreviacao;
     private String codigo;
     private final PropertyChangeSupport support;
+    private static final int ADICIONAR = 0;
+    private static final int REMOVER = 1;
 
     public void addPropertyChangeListener(PropertyChangeListener pcl) {
         support.addPropertyChangeListener(pcl);
@@ -40,18 +42,23 @@ public class Disciplina {
     }
 
     public void adicionarTurma(Turma turma) {
-        Set<Turma> turmasAntigas = new HashSet<>(turmas);
-        turmas.add(turma);
-        support.firePropertyChange("turmas", turmasAntigas, turmas);
+        operareNotificar(turma, ADICIONAR);
     }
 
     public void removerTurma(int id) {
         removerTurma(getTurma(id));
     }
 
-    public void removerTurma(Turma t) {
+    public void removerTurma(Turma turma) {
+        operareNotificar(turma, REMOVER);
+    }
+
+    private void operareNotificar(Turma turma, int operacao) {
         Set<Turma> turmasAntigas = new HashSet<>(turmas);
-        turmas.remove(t);
+        switch (operacao) {
+            case ADICIONAR -> turmas.add(turma);
+            case REMOVER -> turmas.remove(turma);
+        }
         support.firePropertyChange("turmas", turmasAntigas, turmas);
     }
 
