@@ -43,7 +43,7 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Turma>
             }
         }
         if (turmasIntercedentes.size() > 1) {
-            List<Disciplina> disciplinasHorarioUnico = disciplinaSet.stream().filter(Disciplina::isHorarioUnico).toList();
+            List<Disciplina> disciplinasHorarioUnico = turmasIntercedentes.keySet().stream().filter(Disciplina::isHorarioUnico).toList();
             boolean otimizavel = disciplinasHorarioUnico.size() == 1;
             boolean impossivel = disciplinasHorarioUnico.size() > 1;
             return new ConflitoHorario(dia, hora, turmasIntercedentes, otimizavel, impossivel);
