@@ -30,21 +30,14 @@ public class Disciplina {
     }
 
     public void adicionarTurma(int id, String professor, String salas, String horarioCodificado) {
-        Turma turma = new Turma(id, professor, salas, horarioCodificado);
-
-        Set<Turma> turmasAntigas = new HashSet<>(turmas);
-        turmas.add(turma);
-        support.firePropertyChange("turmas", turmasAntigas, turmas);
+        Horario horario = Horario.criarFromCodigo(horarioCodificado);
+        adicionarTurma(id, professor, salas, horario);
     }
 
     public void adicionarTurma(int id, String professor, String salas, Horario horario) {
         Turma turma = new Turma(id, professor, salas, horario);
-
-        Set<Turma> turmasAntigas = new HashSet<>(turmas);
-        turmas.add(turma);
-        support.firePropertyChange("turmas", turmasAntigas, turmas);
+        adicionarTurma(turma);
     }
-
 
     public void adicionarTurma(Turma turma) {
         Set<Turma> turmasAntigas = new HashSet<>(turmas);
@@ -53,9 +46,7 @@ public class Disciplina {
     }
 
     public void removerTurma(int id) {
-        Set<Turma> turmasAntigas = new HashSet<>(turmas);
-        turmas.removeIf(turma -> turma.getId() == id);
-        support.firePropertyChange("turmas", turmasAntigas, turmas);
+        removerTurma(getTurma(id));
     }
 
     public void removerTurma(Turma t) {
