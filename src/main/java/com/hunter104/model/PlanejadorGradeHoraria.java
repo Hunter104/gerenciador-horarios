@@ -69,7 +69,7 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
        conflitos.stream()
                 .filter(ConflitoHorario::otimizavel)
                 .flatMap(conflitoHorario -> conflitoHorario.filtrarTurmasOtimizaveis().entrySet().stream())
-                .forEach(disciplinaTurmaEntry -> disciplinaTurmaEntry.getKey().removerTurma(disciplinaTurmaEntry.getValue()));
+                .forEach(disciplinaTurmaEntry -> disciplinaTurmaEntry.getKey().removerTurmas(disciplinaTurmaEntry.getValue()));
 
         atualizarConflitos();
         if (existemDisciplinasInalcancaveis()) {

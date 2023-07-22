@@ -45,7 +45,7 @@ public class Main {
         gpq.adicionarTurma(1, "REJANE MARIA DA COSTA FIGUEIREIDO","I9", "35T23");
         gpq.adicionarTurma(2, "MARIO DE OLIVEIRA ANDRADE","S3", "35T23");
 
-//        planejador.removerTurmasInalcancaveis();
+        planejador.removerTurmasInalcancaveis();
         return planejador;
     }
 

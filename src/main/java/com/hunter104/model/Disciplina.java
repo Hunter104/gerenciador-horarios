@@ -3,6 +3,7 @@ package com.hunter104.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Disciplina {
     private String nome;
@@ -47,6 +48,10 @@ public class Disciplina {
 
     public void removerTurma(int id) {
         removerTurma(getTurma(id));
+    }
+
+    public void removerTurmas(Collection<Turma> turmas) {
+        turmas.forEach(this::removerTurma);
     }
 
     public void removerTurma(Turma turma) {

@@ -3,7 +3,7 @@ package com.hunter104.model;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Turma> turmas, boolean otimizavel,
+public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Turma>> turmas, boolean otimizavel,
                               boolean impossivel) {
     /**
      * Checa todos os conflitos que todas as turmas das disciplinas escolhidas tem entre sí
@@ -33,17 +33,22 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Turma>
      * @return um objeto ConflitoHorário representando o conflito, null caso não haja conflito
      */
     private static ConflitoHorario checarPorConflito(DiadaSemana dia, Hora hora, Set<Disciplina> disciplinaSet) {
-        Map<Disciplina, Turma> turmasIntercedentes = new HashMap<>();
+        // TODO: achar uma alternativa para esse mapa que só armazena uma turma por disicplina
+        Map<Disciplina, Set<Turma>> turmasIntercedentes = new HashMap<>();
         for (Disciplina disciplina : disciplinaSet) {
+            Set<Turma> turmas = new HashSet<>();
             for (Turma turma : disciplina.getTurmas()) {
                 Horario horario = turma.getHorario();
                 if (horario.temInterseccao(dia, hora)) {
-                    turmasIntercedentes.put(disciplina, turma);
+                    turmas.add(turma);
                 }
+            }
+            if (turmas.size() > 0) {
+                turmasIntercedentes.put(disciplina, turmas);
             }
         }
         if (turmasIntercedentes.size() > 1) {
-            List<Disciplina> disciplinasHorarioUnico = turmasIntercedentes.keySet().stream().filter(Disciplina::isHorarioUnico).toList();
+            Set<Disciplina> disciplinasHorarioUnico = turmasIntercedentes.keySet().stream().filter(Disciplina::isHorarioUnico).collect(Collectors.toSet());
             boolean otimizavel = disciplinasHorarioUnico.size() == 1;
             boolean impossivel = disciplinasHorarioUnico.size() > 1;
             return new ConflitoHorario(dia, hora, turmasIntercedentes, otimizavel, impossivel);
@@ -52,7 +57,7 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Turma>
         }
     }
 
-    public Map<Disciplina, Turma> filtrarTurmasOtimizaveis() {
+    public Map<Disciplina, Set<Turma>> filtrarTurmasOtimizaveis() {
         Disciplina horarioUnico = filtrarDisciplinasHorarioUnico().iterator().next();
         return turmas.entrySet().stream()
                 .filter(turmaEntry -> !turmaEntry.getKey().equals(horarioUnico))
