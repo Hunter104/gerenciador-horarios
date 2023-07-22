@@ -63,7 +63,7 @@ public class TurmasTableModel extends AbstractTableModel {
             return switch (column) {
                 case COL_ID -> turma.getId();
                 case COL_PROFESSOR -> turma.getProfessor();
-                case COL_HORARIO -> turma.getHorario().getHorarioCodificado();
+                case COL_HORARIO -> turma.getHorario().horarioCodificado();
                 case COL_SALA ->  turma.getSalas();
                 default -> null;
             };
@@ -91,16 +91,17 @@ public class TurmasTableModel extends AbstractTableModel {
     }
 
     private Object getElemento(int row, int tipoElemento) {
+        int linhaAtual = 0;
         for (Disciplina disciplina : disciplinas) {
-            List<Turma> turmasList = disciplina.getTurmasPorId();
-            for (int linhaAtual = 0; linhaAtual < turmasList.size(); linhaAtual++) {
+            for (Turma turma : disciplina.getTurmasPorId()) {
                 if (linhaAtual == row) {
                     return switch (tipoElemento){
                         case DISCIPLINA -> disciplina;
-                        case TURMA -> turmasList.get(linhaAtual);
+                        case TURMA -> turma;
                         default -> null;
                     };
                 }
+                linhaAtual++;
             }
         }
         return null;
