@@ -6,8 +6,6 @@ import com.hunter104.model.PlanejadorGradeHoraria;
 
 import javax.swing.*;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
@@ -34,6 +32,10 @@ public class MainWindow implements PropertyChangeListener {
     private JLabel chHorasLabel;
     private JLabel disciplinasTituloLabel;
     private JLabel turmasTituloLabel;
+    private JLabel conflitoEscolhidoLabel;
+    private JPanel visualizarHorarioConflitoPanel;
+    private JPanel VisualizarTurmaConflitoPanel;
+    private JPanel controlPanel;
     private final DisciplinasTableModel crudDisciplinasModel;
     private final TurmasTableModel crudTurmasModel;
     private final PlanejadorGradeHoraria planejador;
@@ -91,6 +93,9 @@ public class MainWindow implements PropertyChangeListener {
             if (optionalConflito.isPresent()) {
                 ConflitoHorario conflito = optionalConflito.get();
                 turmasConflitoTableModel.setTurmas(conflito.turmas());
+                conflitoEscolhidoLabel.setText(
+                        String.format("%s - %s", conflito.hora().getNome(), conflito.dia().getNome())
+                );
             }
         });
         // Labels
@@ -130,6 +135,8 @@ public class MainWindow implements PropertyChangeListener {
             crudTurmasModel.atualizarDados();
         } else if (Objects.equals(evt.getPropertyName(), "conflitos")) {
             conflitosTableModel.setConflitos(planejador.getConflitos());
+            turmasConflitoTableModel.setTurmas(new HashMap<>());
+            conflitoEscolhidoLabel.setText("Nenhum");
         }
     }
 }
