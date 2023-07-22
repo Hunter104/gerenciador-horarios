@@ -5,8 +5,11 @@ import com.hunter104.model.PlanejadorGradeHoraria;
 
 import javax.swing.*;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,6 +38,7 @@ public class MainWindow implements PropertyChangeListener {
     private final DisciplinasTableModel crudDisciplinasModel;
     private final TurmasTableModel crudTurmasModel;
     private final PlanejadorGradeHoraria planejador;
+    private final ConflitosTableModel conflitosTableModel;
 
     public MainWindow() {
 
@@ -51,6 +55,8 @@ public class MainWindow implements PropertyChangeListener {
         crudTurmasModel = new TurmasTableModel(planejador.getDisciplinasOrdemAlfabetica());
         turmasCrudTable.setModel(crudTurmasModel);
 
+        conflitosTableModel = new ConflitosTableModel(planejador.getConflitos());
+        horarioConflitoTable.setModel(conflitosTableModel);
 
         // Botões
         adicionarDisciplinaButton.addActionListener(e -> {
