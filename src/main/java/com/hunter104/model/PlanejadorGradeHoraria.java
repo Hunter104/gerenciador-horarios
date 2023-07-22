@@ -3,13 +3,14 @@ package com.hunter104.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PlanejadorGradeHoraria {
     private final Set<Disciplina> disciplinas;
-    private Set<ConflitoHorario> conflitos;
     private final PropertyChangeSupport support;
     private static final int ADICIONAR = 0;
     private static final int REMOVER = 1;
+    private Set<ConflitoHorario> conflitos;
 
     public PlanejadorGradeHoraria() {
         disciplinas = new HashSet<>();
@@ -55,19 +56,6 @@ public class PlanejadorGradeHoraria {
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
-    public Disciplina getDisciplina(String nome) {
-        return disciplinas.stream().filter(disciplina -> disciplina.getNome().equals(nome)).findFirst().orElseThrow();
-    }
-
-    public boolean existemDisciplinasInalcancaveis() {
-        for (ConflitoHorario conflito : conflitos) {
-            if (conflito.otimizavel()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Remove turmas em conflito com disciplinas de horário único, já que não há como escolher um horário diferente
      * para a disciplina, a única opção é remover as outras turmas do conflito.
@@ -75,25 +63,23 @@ public class PlanejadorGradeHoraria {
     public void removerTurmasInalcancaveis() {
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+        Map<Disciplina, Turma> turmasOtimizaveis = conflitos.stream()
+                .filter(ConflitoHorario::otimizavel)
+                .flatMap(conflitoHorario -> conflitoHorario.filtrarTurmasOtimizaveis().entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        for (ConflitoHorario conflito : conflitos) {
-            if (conflito.otimizavel()) {
-                Map<Disciplina, Integer> turmasOtimizaveis = conflito.filtrarTurmasOtimizaveis();
-                for (Map.Entry<Disciplina, Integer> turmaEntry : turmasOtimizaveis.entrySet()) {
-                    Disciplina disciplina = turmaEntry.getKey();
-                    disciplina.removerTurma(turmaEntry.getValue());
-                }
-            }
-        }
+        turmasOtimizaveis.forEach(Disciplina::removerTurma);
 
-        // Se depois das alterações algumas turmas se tornarem inalcançáveis, chamar a função novamente.
         atualizarConflitos();
         if (existemDisciplinasInalcancaveis()) {
             removerTurmasInalcancaveis();
         }
-
         support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+    }
+
+    public boolean existemDisciplinasInalcancaveis() {
+        return conflitos.stream().anyMatch(ConflitoHorario::otimizavel);
     }
 
     /**
@@ -138,6 +124,14 @@ public class PlanejadorGradeHoraria {
         conflitos = ConflitoHorario.checarPorConflitos(disciplinas);
     }
 
+    public Disciplina getDisciplina(String nome) {
+        return disciplinas.stream().filter(disciplina -> disciplina.getNome().equals(nome)).findFirst().orElseThrow();
+    }
+
+    public List<Disciplina> getDisciplinasOrdemAlfabetica() {
+        return disciplinas.stream().sorted(Comparator.comparing(Disciplina::getNome)).toList();
+    }
+
     public int getCargaHorariaTotalHoras() {
         return disciplinas.stream().map(Disciplina::getCargaHoraria).mapToInt(Integer::intValue).sum();
     }
@@ -171,10 +165,6 @@ public class PlanejadorGradeHoraria {
 
     public Set<Disciplina> getDisciplinas() {
         return disciplinas;
-    }
-
-    public List<Disciplina> getDisciplinasOrdemAlfabetica() {
-        return disciplinas.stream().sorted(Comparator.comparing(Disciplina::getNome)).toList();
     }
 
     public Set<ConflitoHorario> getConflitos() {
