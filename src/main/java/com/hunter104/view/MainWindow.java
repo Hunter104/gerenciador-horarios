@@ -9,8 +9,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Objects;
-import java.util.Observable;
-import java.util.Observer;
 
 import static com.hunter104.Main.criarPlanejadorComDados;
 

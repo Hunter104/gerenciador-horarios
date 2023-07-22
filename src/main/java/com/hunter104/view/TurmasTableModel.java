@@ -4,11 +4,7 @@ import com.hunter104.model.Disciplina;
 import com.hunter104.model.Horario;
 import com.hunter104.model.Turma;
 
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
-import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 

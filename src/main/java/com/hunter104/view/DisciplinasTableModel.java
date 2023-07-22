@@ -79,8 +79,7 @@ public class DisciplinasTableModel extends AbstractTableModel {
 
     public void removeContato(int indiceLinha) {
         linhas.remove(indiceLinha);
-        fireTableRowsDeleted(indiceLinha,
-                indiceLinha);
+        fireTableRowsDeleted(indiceLinha, indiceLinha);
     }
 
     public void setLinhas(List<Disciplina> linhas) {
