@@ -3,7 +3,7 @@ package com.hunter104.model;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Integer> turmas, boolean otimizavel,
+public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Turma> turmas, boolean otimizavel,
                               boolean impossivel) {
     /**
      * Checa todos os conflitos que todas as turmas das disciplinas escolhidas tem entre sí
@@ -33,12 +33,12 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Intege
      * @return um objeto ConflitoHorário representando o conflito, null caso não haja conflito
      */
     private static ConflitoHorario checarPorConflito(DiadaSemana dia, Hora hora, Set<Disciplina> disciplinaSet) {
-        Map<Disciplina, Integer> turmasIntercedentes = new HashMap<>();
+        Map<Disciplina, Turma> turmasIntercedentes = new HashMap<>();
         for (Disciplina disciplina : disciplinaSet) {
             for (Turma turma : disciplina.getTurmas()) {
                 Horario horario = turma.getHorario();
                 if (horario.temInterseccao(dia, hora)) {
-                    turmasIntercedentes.put(disciplina, turma.getId());
+                    turmasIntercedentes.put(disciplina, turma);
                 }
             }
         }
@@ -52,14 +52,11 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Intege
         }
     }
 
-    public Map<Disciplina, Integer> filtrarTurmasOtimizaveis() {
-        if (otimizavel) {
-            Disciplina horarioUnico = filtrarDisciplinasHorarioUnico().iterator().next();
-            return turmas.entrySet().stream()
-                    .filter(turmaEntry -> !turmaEntry.getKey().equals(horarioUnico))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        }
-        return null;
+    public Map<Disciplina, Turma> filtrarTurmasOtimizaveis() {
+        Disciplina horarioUnico = filtrarDisciplinasHorarioUnico().iterator().next();
+        return turmas.entrySet().stream()
+                .filter(turmaEntry -> !turmaEntry.getKey().equals(horarioUnico))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public List<Disciplina> filtrarDisciplinasHorarioUnico() {
