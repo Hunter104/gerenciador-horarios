@@ -63,12 +63,12 @@ public class PlanejadorGradeHoraria {
     public void removerTurmasInalcancaveis() {
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
-        Map<Disciplina, Turma> turmasOtimizaveis = conflitos.stream()
+
+       conflitos.stream()
                 .filter(ConflitoHorario::otimizavel)
                 .flatMap(conflitoHorario -> conflitoHorario.filtrarTurmasOtimizaveis().entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        turmasOtimizaveis.forEach(Disciplina::removerTurma);
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                .forEach(Disciplina::removerTurma);
 
         atualizarConflitos();
         if (existemDisciplinasInalcancaveis()) {
@@ -89,8 +89,8 @@ public class PlanejadorGradeHoraria {
      * @param turmasEscolhidas turmas escolhidas para montar a grade
      * @return Um objeto representando a grade horária
      */
-    public GradeHoraria criarGradeHoraria(Map<Disciplina, Integer> turmasEscolhidas) {
-        Set<Disciplina> disciplinasEscolhidas = criarDisciplinasComTurmas(turmasEscolhidas);
+    public GradeHoraria criarGradeHoraria(Map<Disciplina, Turma> turmasEscolhidas) {
+        Set<DisciplinaEscolhida> disciplinasEscolhidas = criarDisciplinasComTurmas(turmasEscolhidas);
         return new GradeHoraria(disciplinasEscolhidas);
     }
 
