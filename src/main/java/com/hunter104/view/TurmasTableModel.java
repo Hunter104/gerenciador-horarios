@@ -10,6 +10,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 public class TurmasTableModel extends AbstractTableModel {
     private static final int COL_DISCIPLINA = 0;
@@ -17,6 +18,8 @@ public class TurmasTableModel extends AbstractTableModel {
     private static final int COL_PROFESSOR = 2;
     private static final int COL_HORARIO = 3;
     private static final int COL_SALA = 4;
+    private static final int DISCIPLINA = 0;
+    private static final int TURMA = 1;
     List<Disciplina> disciplinas;
     private final String[] colunas = new String[]{"Disciplina", "id",
             "Professor", "Horário", "Sala"};
@@ -51,69 +54,57 @@ public class TurmasTableModel extends AbstractTableModel {
     @Override
     public boolean isCellEditable(int rowIndex, int
             columnIndex) {
-        return columnIndex != COL_DISCIPLINA && columnIndex != COL_HORARIO;
+        return columnIndex != COL_DISCIPLINA;
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        int linhaAtual = 0;
-        for (Disciplina disciplina : disciplinas) {
-            for (Turma turma : disciplina.getTurmasPorId()) {
-                if (linhaAtual == row) {
-                    return switch (column) {
-                        case COL_DISCIPLINA -> disciplina.getNome();
-                        case COL_ID -> turma.getId();
-                        case COL_PROFESSOR -> turma.getProfessor();
-                        case COL_HORARIO -> turma.getHorario().getHorarioCodificado();
-                        case COL_SALA ->  turma.getSalas();
-                        default -> null;
-                    };
-                }
-                linhaAtual++;
-            }
+        if (column == 0) {
+            Disciplina disciplina = Objects.requireNonNull((Disciplina) getElemento(row, DISCIPLINA));
+            return disciplina.getNome();
+        } else {
+            Turma turma = Objects.requireNonNull((Turma) getElemento(row, TURMA));
+            return switch (column) {
+                case COL_ID -> turma.getId();
+                case COL_PROFESSOR -> turma.getProfessor();
+                case COL_HORARIO -> turma.getHorario().getHorarioCodificado();
+                case COL_SALA ->  turma.getSalas();
+                default -> null;
+            };
         }
-        return null;
     }
 
     @Override
     public void setValueAt(Object aValue, int row,
                              int column) {
-        int linhaAtual = 0;
-        for (Disciplina disciplina : disciplinas) {
-            for (Turma turma : disciplina.getTurmasPorId()) {
-                if (linhaAtual == row) {
-                    switch (column) {
-                        case COL_ID -> turma.setId((Integer) aValue);
-                        case COL_PROFESSOR -> turma.setProfessor((String) aValue);
-                        case COL_SALA -> turma.setSalas((String) aValue);
-                    }
-                }
-                linhaAtual++;
-            }
+        Turma turma = Objects.requireNonNull((Turma) getElemento(row, TURMA));
+        switch (column) {
+            case COL_ID -> turma.setId((Integer) aValue);
+            case COL_PROFESSOR -> turma.setProfessor((String) aValue);
+            case COL_HORARIO -> turma.setHorario(Horario.criarFromCodigo((String) aValue));
+            case COL_SALA -> turma.setSalas((String) aValue);
         }
     }
 
     public Turma getTurma(int row) {
-        int linhaAtual = 0;
-        for (Disciplina disciplina : disciplinas) {
-            for (Turma turma : disciplina.getTurmasPorId()) {
-                if (linhaAtual == row) {
-                    return turma;
-                }
-                linhaAtual++;
-            }
-        }
-        return null;
+        return (Turma) getElemento(row, TURMA);
     }
 
     public Disciplina getDisciplina(int row) {
-        int linhaAtual = 0;
+        return (Disciplina) getElemento(row, DISCIPLINA);
+    }
+
+    private Object getElemento(int row, int tipoElemento) {
         for (Disciplina disciplina : disciplinas) {
-            for (Turma ignored : disciplina.getTurmasPorId()) {
+            List<Turma> turmasList = disciplina.getTurmasPorId();
+            for (int linhaAtual = 0; linhaAtual < turmasList.size(); linhaAtual++) {
                 if (linhaAtual == row) {
-                    return disciplina;
+                    return switch (tipoElemento){
+                        case DISCIPLINA -> disciplina;
+                        case TURMA -> turmasList.get(linhaAtual);
+                        default -> null;
+                    };
                 }
-                linhaAtual++;
             }
         }
         return null;
