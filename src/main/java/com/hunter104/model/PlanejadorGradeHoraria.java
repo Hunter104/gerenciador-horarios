@@ -61,7 +61,7 @@ public class PlanejadorGradeHoraria {
 
     public boolean existemDisciplinasInalcancaveis() {
         for (ConflitoHorario conflito : conflitos) {
-            if (conflito.isOtimizavel()) {
+            if (conflito.otimizavel()) {
                 return true;
             }
         }
@@ -77,7 +77,7 @@ public class PlanejadorGradeHoraria {
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
 
         for (ConflitoHorario conflito : conflitos) {
-            if (conflito.isOtimizavel()) {
+            if (conflito.otimizavel()) {
                 Map<Disciplina, Integer> turmasOtimizaveis = conflito.filtrarTurmasOtimizaveis();
                 for (Map.Entry<Disciplina, Integer> turmaEntry : turmasOtimizaveis.entrySet()) {
                     Disciplina disciplina = turmaEntry.getKey();
