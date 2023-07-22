@@ -7,11 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Horario {
-    private Set<Hora> horas;
-    private Set<DiadaSemana> dias;
-    private String horarioCodificado;
-
+public record Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodificado) {
     public static Horario criarFromCodigo(String horarioCodificado) {
         Pattern pattern = Pattern.compile("^([2-7]+)([MNT])([1-5]+)$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(horarioCodificado);
@@ -45,47 +41,7 @@ public class Horario {
             throw new IllegalArgumentException("código de horário tem formato inválido");
         }
     }
-
-    public Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodificado) {
-        this.dias = dias;
-        this.horas = horas;
-        this.horarioCodificado = horarioCodificado;
-    }
-
     public boolean temInterseccao(DiadaSemana dia, Hora hora) {
         return dias.contains(dia) && horas.contains(hora);
-    }
-
-    @Override
-    public String toString() {
-        return "Horario{" +
-                "horas=" + horas +
-                ", dias=" + dias +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Horario horario = (Horario) o;
-        return Objects.equals(horas, horario.horas) && Objects.equals(dias, horario.dias);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(horas, dias);
-    }
-
-    public Set<Hora> getHoras() {
-        return horas;
-    }
-
-    public Set<DiadaSemana> getDias() {
-        return dias;
-    }
-
-    public String getHorarioCodificado() {
-        return horarioCodificado;
     }
 }
