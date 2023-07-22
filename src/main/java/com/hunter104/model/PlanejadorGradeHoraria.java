@@ -1,11 +1,12 @@
 package com.hunter104.model;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PlanejadorGradeHoraria {
+public class PlanejadorGradeHoraria implements PropertyChangeListener{
     private final Set<Disciplina> disciplinas;
     private final PropertyChangeSupport support;
     private static final int ADICIONAR = 0;
@@ -31,6 +32,7 @@ public class PlanejadorGradeHoraria {
     }
 
     public void adicionarDisciplina(Disciplina disciplina) {
+        disciplina.addPropertyChangeListener(this);
         operareNotificar(disciplina, ADICIONAR);
     }
 
@@ -67,8 +69,7 @@ public class PlanejadorGradeHoraria {
        conflitos.stream()
                 .filter(ConflitoHorario::otimizavel)
                 .flatMap(conflitoHorario -> conflitoHorario.filtrarTurmasOtimizaveis().entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-                .forEach(Disciplina::removerTurma);
+                .forEach(disciplinaTurmaEntry -> disciplinaTurmaEntry.getKey().removerTurma(disciplinaTurmaEntry.getValue()));
 
         atualizarConflitos();
         if (existemDisciplinasInalcancaveis()) {
@@ -80,44 +81,6 @@ public class PlanejadorGradeHoraria {
 
     public boolean existemDisciplinasInalcancaveis() {
         return conflitos.stream().anyMatch(ConflitoHorario::otimizavel);
-    }
-
-    /**
-     * Tenta criar uma grade horária com as turmas escolhidas,
-     * disciplinas com turmas únicas são opcionais
-     *
-     * @param turmasEscolhidas turmas escolhidas para montar a grade
-     * @return Um objeto representando a grade horária
-     */
-    public GradeHoraria criarGradeHoraria(Map<Disciplina, Turma> turmasEscolhidas) {
-        Set<DisciplinaEscolhida> disciplinasEscolhidas = criarDisciplinasComTurmas(turmasEscolhidas);
-        return new GradeHoraria(disciplinasEscolhidas);
-    }
-
-    /**
-     * Cria uma cópia das disciplinas contendo apenas as turmas escolhidas
-     * @param turmasEscolhidas turmas escolhidas para copiar
-     * @return um conjunto com uma cópia das disciplinas contendo apenas as turmas escolhidas
-     */
-    private Set<Disciplina> criarDisciplinasComTurmas(Map<Disciplina, Integer> turmasEscolhidas) {
-        Set<Disciplina> disciplinas = new HashSet<>();
-        for (Map.Entry<Disciplina, Integer> turmaEntry : turmasEscolhidas.entrySet()) {
-            Disciplina disciplinaAtual = turmaEntry.getKey();
-            Turma turmaAtual = disciplinaAtual.getTurma(turmaEntry.getValue());
-            Disciplina disciplinaCopiada = new Disciplina(
-                    disciplinaAtual.getCodigo(),
-                    disciplinaAtual.getNome(),
-                    disciplinaAtual.getAbreviacao(),
-                    disciplinaAtual.getCargaHoraria());
-            disciplinaCopiada.adicionarTurma(
-                    turmaAtual.getId(),
-                    turmaAtual.getProfessor(),
-                    turmaAtual.getSalas(),
-                    turmaAtual.getHorario()
-            );
-            disciplinas.add(disciplinaCopiada);
-        }
-        return disciplinas;
     }
 
     public void atualizarConflitos() {
@@ -139,6 +102,13 @@ public class PlanejadorGradeHoraria {
     public int getCargaHorariaTotalCreditos() {
         int cargaHoras = disciplinas.stream().map(Disciplina::getCargaHoraria).mapToInt(Integer::intValue).sum();
         return (cargaHoras/15);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (Objects.equals(evt.getPropertyName(), "turmas")) {
+            atualizarConflitos();
+        }
     }
 
 
