@@ -3,6 +3,7 @@ package com.hunter104.view;
 import com.hunter104.model.ConflitoHorario;
 import com.hunter104.model.Disciplina;
 import com.hunter104.model.PlanejadorGradeHoraria;
+import com.hunter104.model.Turma;
 
 import javax.swing.*;
 
@@ -47,7 +48,6 @@ public class MainWindow implements PropertyChangeListener {
         // Modelo
         planejador = criarPlanejadorComDados();
         planejador.addPropertyChangeListener(this);
-
         planejador.getDisciplinas().forEach(disciplina -> disciplina.addPropertyChangeListener(this));
 
         // Tabelas
@@ -64,46 +64,42 @@ public class MainWindow implements PropertyChangeListener {
         turmasConflitoTable.setModel(turmasConflitoTableModel);
 
         // Botões
-        adicionarDisciplinaButton.addActionListener(e -> {
-            AdicionarDisciplina dialog = new AdicionarDisciplina(planejador);
-            dialog.setTitle("Cadastrar nova disciplina");
-            dialog.pack();
-            dialog.setVisible(true);
-        });
+        adicionarDisciplinaButton.addActionListener(e ->
+                mostrarDialogo(new AdicionarDisciplina(planejador), "Cadastrar nova disciplina")
+        );
         removerDisciplinaButton.addActionListener(e -> planejador.removerDisciplina(
                 crudDisciplinasModel.getDisciplina(disciplinasCrudTable.getSelectedRow()).getNome()
         ));
-        adicionarTurmaButton.addActionListener(e -> {
-            AdicionarTurma dialog = new AdicionarTurma(planejador);
-            dialog.setTitle("Cadastrar nova turma");
-            dialog.pack();
-            dialog.setVisible(true);
-        });
+
+        adicionarTurmaButton.addActionListener(e ->
+                mostrarDialogo(new AdicionarTurma(planejador), "Cadastrar nova turma")
+        );
         removerTurmaButton.addActionListener(e -> {
             int row = turmasCrudTable.getSelectedRow();
-            Disciplina d = crudTurmasModel.getDisciplina(row);
-            int id = crudTurmasModel.getTurma(row).getId();
-            d.removerTurma(id);
+            Turma turma = crudTurmasModel.getTurma(row);
+            crudTurmasModel.getDisciplina(row).removerTurma(turma);
         });
+
         // TODO: trocar null checks por optionals
         visualizarConflitoButton.addActionListener(e -> {
             int row = horarioConflitoTable.getSelectedRow();
             int column = horarioConflitoTable.getSelectedColumn();
-            Optional<ConflitoHorario> optionalConflito = conflitosTableModel.getConflito(row, column);
-            if (optionalConflito.isPresent()) {
-                ConflitoHorario conflito = optionalConflito.get();
+            conflitosTableModel.getConflito(row, column).ifPresent(conflito -> {
                 turmasConflitoTableModel.setTurmas(conflito.turmas());
-                conflitoEscolhidoLabel.setText(
-                        String.format("%s - %s", conflito.hora().getNome(), conflito.dia().getNome())
-                );
-            }
+                conflitoEscolhidoLabel.setText(formatarConflito(conflito));
+            });
         });
+        otimizarButton.addActionListener(e -> planejador.removerTurmasInalcancaveis());
+
         // Labels
         chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
         disciplinasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
         turmasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
 
-        otimizarButton.addActionListener(e -> planejador.removerTurmasInalcancaveis());
+    }
+
+    private String formatarConflito(ConflitoHorario conflito) {
+        return String.format("%s - %s", conflito.hora().getNome(), conflito.dia().getNome());
     }
 
     public static void main(String[] args) {
@@ -119,10 +115,15 @@ public class MainWindow implements PropertyChangeListener {
         frame.setVisible(true);
     }
 
+    private void mostrarDialogo(JDialog dialog, String titulo) {
+        dialog.setTitle(titulo);
+        dialog.pack();
+        dialog.setVisible(true);
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (Objects.equals(evt.getPropertyName(), "disciplinas")) {
-            // Cadastrar observadores para as novas disciplinas
             planejador.getDisciplinas().forEach(disciplina -> disciplina.addPropertyChangeListener(this));
 
             List<Disciplina> novasDisciplinas = planejador.getDisciplinasOrdemAlfabetica();

@@ -39,8 +39,7 @@ public abstract class AbstractTurmaTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int row, int column) {
         if (column == 0) {
-            Disciplina disciplina =(Disciplina) getElemento(row, DISCIPLINA).orElseThrow();
-            return disciplina.getNome();
+            return ((Optional<Disciplina>) getElemento(row, DISCIPLINA)).map(Disciplina::getNome).orElse(null);
         } else {
             Turma turma = (Turma) getElemento(row, TURMA).orElseThrow();
             return switch (column) {
