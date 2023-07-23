@@ -7,6 +7,8 @@ import com.hunter104.model.Turma;
 
 import javax.swing.*;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
@@ -14,6 +16,13 @@ import java.util.*;
 import static com.hunter104.Main.criarPlanejadorComDados;
 
 public class MainWindow implements PropertyChangeListener {
+    private final DisciplinasTableModel crudDisciplinasModel;
+    private final TurmasTableModel crudTurmasModel;
+    private final PlanejadorGradeHoraria planejador;
+    private final ConflitosTableModel conflitosTableModel;
+    private final TurmasEspecificasTableModel turmasConflitoTableModel;
+    private final TurmasEspecificasTableModel turmasPossiveisTableModel;
+    private final TurmasEspecificasTableModel turmasEscolhidasTableModel;
     private JTabbedPane Main;
     private JButton adicionarDisciplinaButton;
     private JButton removerDisciplinaButton;
@@ -28,7 +37,7 @@ public class MainWindow implements PropertyChangeListener {
     private JTable turmasPossiveisTable;
     private JTable turmasEscolhidasTable;
     private JButton escolherTurmaButton;
-    private JButton removerTurmaButton2;
+    private JButton removerTurmaEscolhida;
     private JButton exportarDadosButton;
     private JLabel chHorasLabel;
     private JLabel disciplinasTituloLabel;
@@ -37,11 +46,6 @@ public class MainWindow implements PropertyChangeListener {
     private JPanel visualizarHorarioConflitoPanel;
     private JPanel VisualizarTurmaConflitoPanel;
     private JPanel controlPanel;
-    private final DisciplinasTableModel crudDisciplinasModel;
-    private final TurmasTableModel crudTurmasModel;
-    private final PlanejadorGradeHoraria planejador;
-    private final ConflitosTableModel conflitosTableModel;
-    private final TurmasEspecificasTableModel turmasConflitoTableModel;
 
     public MainWindow() {
 
@@ -63,12 +67,18 @@ public class MainWindow implements PropertyChangeListener {
         turmasConflitoTableModel = new TurmasEspecificasTableModel(new HashMap<>());
         turmasConflitoTable.setModel(turmasConflitoTableModel);
 
+        turmasPossiveisTableModel = new TurmasEspecificasTableModel(planejador.getTurmasEscolhiveis());
+        turmasPossiveisTable.setModel(turmasPossiveisTableModel);
+
+        turmasEscolhidasTableModel = new TurmasEspecificasTableModel(planejador.getTurmasEscolhidasSet());
+        turmasEscolhidasTable.setModel(turmasEscolhidasTableModel);
+
         // Botões
         adicionarDisciplinaButton.addActionListener(e ->
                 mostrarDialogo(new AdicionarDisciplina(planejador), "Cadastrar nova disciplina")
         );
         removerDisciplinaButton.addActionListener(e -> planejador.removerDisciplina(
-                crudDisciplinasModel.getDisciplina(disciplinasCrudTable.getSelectedRow()).getNome()
+                crudDisciplinasModel.getDisciplina(disciplinasCrudTable.getSelectedRow())
         ));
 
         adicionarTurmaButton.addActionListener(e ->
@@ -76,8 +86,11 @@ public class MainWindow implements PropertyChangeListener {
         );
         removerTurmaButton.addActionListener(e -> {
             int row = turmasCrudTable.getSelectedRow();
-            Turma turma = crudTurmasModel.getTurma(row);
-            crudTurmasModel.getDisciplina(row).removerTurma(turma);
+            Optional<Turma> turmaEscolhida = crudTurmasModel.getTurma(row);
+            Optional<Disciplina> disciplinaEscolhida = crudTurmasModel.getDisciplina(row);
+            turmaEscolhida.ifPresent(turma ->
+                    disciplinaEscolhida.ifPresent(disciplina -> disciplina.removerTurma(turma))
+            );
         });
 
         // TODO: trocar null checks por optionals
@@ -96,16 +109,18 @@ public class MainWindow implements PropertyChangeListener {
         disciplinasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
         turmasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
 
-    }
-
-    private String formatarConflito(ConflitoHorario conflito) {
-        return String.format("%s - %s", conflito.hora().getNome(), conflito.dia().getNome());
+        escolherTurmaButton.addActionListener(e -> {
+            int row = turmasPossiveisTable.getSelectedRow();
+            Optional<Map.Entry<Disciplina, Turma>> turmaEscolhida = turmasPossiveisTableModel.getElemento(row);
+            turmaEscolhida.ifPresent(planejador::escolherUmaTurma);
+        });
     }
 
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel("com.formdev.flatlaf.FlatDarculaLaf");
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                 UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
         JFrame frame = new JFrame("Planejador de disciplinas");
@@ -113,6 +128,10 @@ public class MainWindow implements PropertyChangeListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+    }
+
+    private String formatarConflito(ConflitoHorario conflito) {
+        return String.format("%s - %s", conflito.hora().getNome(), conflito.dia().getNome());
     }
 
     private void mostrarDialogo(JDialog dialog, String titulo) {
@@ -123,21 +142,34 @@ public class MainWindow implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (Objects.equals(evt.getPropertyName(), "disciplinas")) {
-            planejador.getDisciplinas().forEach(disciplina -> disciplina.addPropertyChangeListener(this));
+        switch (evt.getPropertyName()) {
+            case "disciplinas" -> {
+                planejador.getDisciplinas().forEach(disciplina -> disciplina.addPropertyChangeListener(this));
 
-            List<Disciplina> novasDisciplinas = planejador.getDisciplinasOrdemAlfabetica();
+                List<Disciplina> novasDisciplinas = planejador.getDisciplinasOrdemAlfabetica();
 
-            crudDisciplinasModel.setLinhas(novasDisciplinas);
-            crudTurmasModel.setDisciplinas(novasDisciplinas);
+                crudDisciplinasModel.setLinhas(novasDisciplinas);
+                crudTurmasModel.setDisciplinas(novasDisciplinas);
 
-            chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
-        } else if (Objects.equals(evt.getPropertyName(), "turmas")) {
-            crudTurmasModel.atualizarDados();
-        } else if (Objects.equals(evt.getPropertyName(), "conflitos")) {
-            conflitosTableModel.setConflitos(planejador.getConflitos());
-            turmasConflitoTableModel.setTurmas(new HashMap<>());
-            conflitoEscolhidoLabel.setText("Nenhum");
+                chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
+
+                turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
+            }
+            case "turmas" -> {
+                crudTurmasModel.atualizarDados();
+                turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
+            }
+            case "conflitos" -> {
+                conflitosTableModel.setConflitos(planejador.getConflitos());
+                turmasConflitoTableModel.setTurmas(new HashMap<>());
+                conflitoEscolhidoLabel.setText("Nenhum");
+            }
+            case "turmasEscolhidas" -> {
+                turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
+            }
         }
     }
 }

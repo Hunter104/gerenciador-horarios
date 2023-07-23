@@ -7,6 +7,7 @@ import com.hunter104.model.Turma;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.text.html.Option;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TurmasEspecificasTableModel extends AbstractTurmaTableModel {
     Map<Disciplina, Set<Turma>> turmas;
@@ -17,21 +18,17 @@ public class TurmasEspecificasTableModel extends AbstractTurmaTableModel {
 
     @Override
     public int getRowCount() {
-        return turmas.size();
+        return turmas.values().stream().mapToInt(Set::size).sum();
     }
 
-
-    protected Optional<?> getElemento(int row, int tipoElemento) {
+    @Override
+    public Optional<Map.Entry<Disciplina, Turma>> getElemento(int row) {
         int linhaAtual = 0;
         List<Disciplina> disciplinasAlfabeticas = turmas.keySet().stream().sorted(Comparator.comparing(Disciplina::getNome)).toList();
         for (Disciplina disciplina : disciplinasAlfabeticas) {
             for (Turma turma : getTurmasOrdemId(disciplina)) {
                 if (linhaAtual == row) {
-                    return switch (tipoElemento){
-                        case DISCIPLINA -> Optional.of(disciplina);
-                        case TURMA -> Optional.of(turma);
-                        default -> Optional.empty();
-                    };
+                    return Optional.of(Map.entry(disciplina, turma));
                 }
                 linhaAtual++;
             }

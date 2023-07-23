@@ -1,5 +1,6 @@
 package com.hunter104.model;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class Turma {
@@ -28,17 +29,12 @@ public class Turma {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Turma turma = (Turma) o;
-        return id == turma.id && Objects.equals(professor, turma.professor) && Objects.equals(horario, turma.horario);
+    public boolean conflitaComTurma(Turma turma) {
+        return turma.getHorario().temInterseccao(this.getHorario());
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, professor, horario);
+    public boolean conflitaComTurmas(Collection<Turma> turmas) {
+        return turmas.stream().anyMatch(this::conflitaComTurma);
     }
 
     public int getId() {

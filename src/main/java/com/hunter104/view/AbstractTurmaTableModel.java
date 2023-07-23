@@ -1,11 +1,10 @@
 package com.hunter104.view;
 
 import com.hunter104.model.Disciplina;
-import com.hunter104.model.Horario;
 import com.hunter104.model.Turma;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public abstract class AbstractTurmaTableModel extends AbstractTableModel {
@@ -18,6 +17,7 @@ public abstract class AbstractTurmaTableModel extends AbstractTableModel {
     protected static final int TURMA = 1;
     private final String[] colunas = new String[]{"Disciplina", "id",
             "Professor", "Horário", "Sala"};
+
     @Override
     public int getColumnCount() {
         return colunas.length;
@@ -39,28 +39,38 @@ public abstract class AbstractTurmaTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int row, int column) {
         if (column == 0) {
-            return ((Optional<Disciplina>) getElemento(row, DISCIPLINA)).map(Disciplina::getNome).orElse(null);
+            return getDisciplina(row).map(Disciplina::getNome).orElse(null);
         } else {
-            Turma turma = (Turma) getElemento(row, TURMA).orElseThrow();
-            return switch (column) {
-                case COL_ID -> turma.getId();
-                case COL_PROFESSOR -> turma.getProfessor();
-                case COL_HORARIO -> turma.getHorario().horarioCodificado();
-                case COL_SALA ->  turma.getSalas();
-                default -> null;
-            };
+            return getTurma(row).map(turma -> getCampo(column, turma)).orElse(null);
         }
     }
 
-    public Turma getTurma(int row) {
-        return (Turma) getElemento(row, TURMA).orElseThrow();
+    /**
+     * Retorna o campo de uma turma presente em uma certa coluna
+     *
+     * @param turma  turma a ter o campo lido
+     * @param column coluna onde o campo está presente
+     * @return um objeto com a contedo a informação lida do campo
+     */
+    private Object getCampo(int column, Turma turma) {
+        return switch (column) {
+            case COL_ID -> turma.getId();
+            case COL_PROFESSOR -> turma.getProfessor();
+            case COL_HORARIO -> turma.getHorario().horarioCodificado();
+            case COL_SALA -> turma.getSalas();
+            default -> null;
+        };
     }
 
-    public Disciplina getDisciplina(int row) {
-        return (Disciplina) getElemento(row, DISCIPLINA).orElseThrow();
+    public Optional<Turma> getTurma(int row) {
+        return getElemento(row).map(Map.Entry::getValue);
     }
 
-    abstract protected Optional<?> getElemento(int row, int tipoElemento);
+    public Optional<Disciplina> getDisciplina(int row) {
+        return getElemento(row).map(Map.Entry::getKey);
+    }
+
+    abstract public Optional<Map.Entry<Disciplina, Turma>> getElemento(int row);
 
     public void atualizarDados() {
         fireTableDataChanged();

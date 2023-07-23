@@ -4,13 +4,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class PlanejadorGradeHoraria implements PropertyChangeListener{
-    private final Set<Disciplina> disciplinas;
-    private final PropertyChangeSupport support;
+public class PlanejadorGradeHoraria implements PropertyChangeListener {
     private static final int ADICIONAR = 0;
     private static final int REMOVER = 1;
+    private final Set<Disciplina> disciplinas;
+    private final PropertyChangeSupport support;
     private Set<ConflitoHorario> conflitos;
     private Map<Disciplina, Turma> turmasEscolhidas;
 
@@ -30,7 +31,7 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
     }
 
     public void adicionarDisciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
-        adicionarDisciplina(new Disciplina(codigo, nome, abreviacao,cargaHoraria));
+        adicionarDisciplina(new Disciplina(codigo, nome, abreviacao, cargaHoraria));
     }
 
     public void adicionarDisciplina(Disciplina disciplina) {
@@ -50,22 +51,58 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
 
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+        Map<Disciplina, Turma> turmasEscolhidasAntigas = new HashMap<>(turmasEscolhidas);
 
         switch (operacao) {
             case ADICIONAR -> disciplinas.add(disciplina);
             case REMOVER -> disciplinas.remove(disciplina);
         }
+        atualizarConflitos();
+        atualizarTurmasEscolhidas();
 
         support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+        support.firePropertyChange("turmasEscolhidas", turmasEscolhidasAntigas, turmasEscolhidas);
     }
 
-    public void escolherUmaTurma(Map<Disciplina, Turma> turmaEscolhida) {
-        turmasEscolhidas.putAll(turmaEscolhida);
+    public void escolherUmaTurma(Map.Entry<Disciplina, Turma> turmaEscolhida) {
+        Map<Disciplina, Turma> turmasEscolhidasAntigas = new HashMap<>(turmasEscolhidas);
+
+        turmasEscolhidas.put(turmaEscolhida.getKey(), turmaEscolhida.getValue());
+
+        support.firePropertyChange("turmasEscolhidas", turmasEscolhidasAntigas, turmasEscolhidas);
+    }
+
+    // TODO: remover nome horrível
+    public Map<Disciplina, Set<Turma>> getTurmasEscolhiveis() {
+        Set<Turma> turmasEscolhidasSet = new HashSet<>(turmasEscolhidas.values());
+        Set<Disciplina> disciplinasEscolhidas = new HashSet<>(turmasEscolhidas.keySet());
+        return disciplinas.stream()
+                .filter(Predicate.not(disciplinasEscolhidas::contains))   // Filtrar disciplinas que não foram escolhidas
+                .collect(Collectors.toMap(                  // Criar um mapa com
+                                disciplina -> disciplina,   // discicplinas filtradas
+                                disciplina -> disciplina    // turmas sem conflito com as turmas escolhidas
+                                        .getTurmas()
+                                        .stream()
+                                        .filter(turma -> !turma.conflitaComTurmas(turmasEscolhidasSet))
+                                        .collect(Collectors.toSet())
+                        )
+                );
+    }
+
+    private void atualizarTurmasEscolhidas() {
+        Set<Turma> todasAsTurmas = disciplinas
+                .stream()
+                .flatMap(disciplina -> disciplina.getTurmas().stream())
+                .collect(Collectors.toSet());
+        turmasEscolhidas = turmasEscolhidas.entrySet().stream()
+                .filter(entry -> disciplinas.contains(entry.getKey()) && todasAsTurmas.contains(entry.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**
      * Verifica se há algum conflito com as turmas escolhidas
+     *
      * @return true caso as turmas não tenham nenhum conflito, false caso contrário
      */
     public boolean validarTurmasEscolhidas() {
@@ -80,12 +117,13 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
 
-       conflitos.stream()
+        conflitos.stream()
                 .filter(ConflitoHorario::otimizavel)
                 .flatMap(conflitoHorario -> conflitoHorario.filtrarTurmasOtimizaveis().entrySet().stream())
                 .forEach(disciplinaTurmaEntry -> disciplinaTurmaEntry.getKey().removerTurmas(disciplinaTurmaEntry.getValue()));
 
         atualizarConflitos();
+        atualizarTurmasEscolhidas();
         if (existemDisciplinasInalcancaveis()) {
             removerTurmasInalcancaveis();
         }
@@ -115,16 +153,16 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
 
     public int getCargaHorariaTotalCreditos() {
         int cargaHoras = disciplinas.stream().map(Disciplina::getCargaHoraria).mapToInt(Integer::intValue).sum();
-        return (cargaHoras/15);
+        return (cargaHoras / 15);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (Objects.equals(evt.getPropertyName(), "turmas")) {
             atualizarConflitos();
+            atualizarTurmasEscolhidas();
         }
     }
-
 
     @Override
     public String toString() {
@@ -134,18 +172,6 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PlanejadorGradeHoraria that = (PlanejadorGradeHoraria) o;
-        return Objects.equals(disciplinas, that.disciplinas) && Objects.equals(conflitos, that.conflitos);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(disciplinas, conflitos);
-    }
 
     public Set<Disciplina> getDisciplinas() {
         return disciplinas;
@@ -159,15 +185,15 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
         return turmasEscolhidas;
     }
 
+    public void setTurmasEscolhidas(Map<Disciplina, Turma> turmasEscolhidas) {
+        this.turmasEscolhidas = turmasEscolhidas;
+    }
+
     // TODO: fazer o turmas escolhidas ser um Map<Disciplina, Set<Turma>> para deixar o código mais generalizado
     public Map<Disciplina, Set<Turma>> getTurmasEscolhidasSet() {
         return turmasEscolhidas
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> Set.of(entry.getValue())));
-    }
-
-    public void setTurmasEscolhidas(Map<Disciplina, Turma> turmasEscolhidas) {
-        this.turmasEscolhidas = turmasEscolhidas;
     }
 }
