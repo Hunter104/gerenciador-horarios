@@ -159,6 +159,14 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
         return turmasEscolhidas;
     }
 
+    // TODO: fazer o turmas escolhidas ser um Map<Disciplina, Set<Turma>> para deixar o código mais generalizado
+    public Map<Disciplina, Set<Turma>> getTurmasEscolhidasSet() {
+        return turmasEscolhidas
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Set.of(entry.getValue())));
+    }
+
     public void setTurmasEscolhidas(Map<Disciplina, Turma> turmasEscolhidas) {
         this.turmasEscolhidas = turmasEscolhidas;
     }
