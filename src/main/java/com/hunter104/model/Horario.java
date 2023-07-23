@@ -1,6 +1,7 @@
 package com.hunter104.model;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -43,5 +44,13 @@ public record Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodi
     }
     public boolean temInterseccao(DiadaSemana dia, Hora hora) {
         return dias.contains(dia) && horas.contains(hora);
+    }
+
+    public boolean temInterseccao(Horario horario) {
+        Set<DiadaSemana> diasIntercedentes = new HashSet<>(horario.dias());
+        Set<Hora> horasIntercedentes = new HashSet<>(horario.horas());
+        diasIntercedentes.retainAll(this.dias);
+        horasIntercedentes.retainAll(this.horas);
+        return diasIntercedentes.size() > 0 && horasIntercedentes.size() > 0;
     }
 }

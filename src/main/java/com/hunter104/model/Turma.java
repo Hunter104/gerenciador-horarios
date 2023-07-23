@@ -1,5 +1,6 @@
 package com.hunter104.model;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class Turma {
@@ -26,6 +27,14 @@ public class Turma {
                 ", professor='" + professor + '\'' +
                 ", horario=" + horario +
                 '}';
+    }
+
+    public boolean conflitaComTurma(Turma turma) {
+        return turma.getHorario().temInterseccao(turma.getHorario());
+    }
+
+    public boolean conflitaComTurmas(Collection<Turma> turmas) {
+        return turmas.stream().anyMatch(this::conflitaComTurma);
     }
 
     @Override
