@@ -15,10 +15,7 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Tu
         Set<ConflitoHorario> conflitos = new HashSet<>();
         for (DiadaSemana dia : DiadaSemana.values()) {
             for (Hora hora : Hora.values()) {
-                ConflitoHorario conflito = ConflitoHorario.checarPorConflito(dia, hora, disciplinas);
-                if (conflito != null) {
-                    conflitos.add(conflito);
-                }
+                ConflitoHorario.checarPorConflito(dia, hora, disciplinas).ifPresent(conflitos::add);
             }
         }
         return conflitos;
@@ -32,7 +29,7 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Tu
      * @param disciplinaSet conjunto de disciplinas escolhidas para o teste
      * @return um objeto ConflitoHorário representando o conflito, null caso não haja conflito
      */
-    private static ConflitoHorario checarPorConflito(DiadaSemana dia, Hora hora, Set<Disciplina> disciplinaSet) {
+    private static Optional<ConflitoHorario> checarPorConflito(DiadaSemana dia, Hora hora, Set<Disciplina> disciplinaSet) {
         // TODO: achar uma alternativa para esse mapa que só armazena uma turma por disicplina
         Map<Disciplina, Set<Turma>> turmasIntercedentes = new HashMap<>();
         for (Disciplina disciplina : disciplinaSet) {
@@ -51,9 +48,10 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Tu
             Set<Disciplina> disciplinasHorarioUnico = turmasIntercedentes.keySet().stream().filter(Disciplina::isHorarioUnico).collect(Collectors.toSet());
             boolean otimizavel = disciplinasHorarioUnico.size() == 1;
             boolean impossivel = disciplinasHorarioUnico.size() > 1;
-            return new ConflitoHorario(dia, hora, turmasIntercedentes, otimizavel, impossivel);
+            ConflitoHorario conflito =  new ConflitoHorario(dia, hora, turmasIntercedentes, otimizavel, impossivel);
+            return Optional.of(conflito);
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
