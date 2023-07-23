@@ -7,11 +7,11 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class PlanejadorGradeHoraria implements PropertyChangeListener{
-    private final Set<Disciplina> disciplinas;
-    private final PropertyChangeSupport support;
+public class PlanejadorGradeHoraria implements PropertyChangeListener {
     private static final int ADICIONAR = 0;
     private static final int REMOVER = 1;
+    private final Set<Disciplina> disciplinas;
+    private final PropertyChangeSupport support;
     private Set<ConflitoHorario> conflitos;
     private Map<Disciplina, Turma> turmasEscolhidas;
 
@@ -31,7 +31,7 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
     }
 
     public void adicionarDisciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
-        adicionarDisciplina(new Disciplina(codigo, nome, abreviacao,cargaHoraria));
+        adicionarDisciplina(new Disciplina(codigo, nome, abreviacao, cargaHoraria));
     }
 
     public void adicionarDisciplina(Disciplina disciplina) {
@@ -62,7 +62,11 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
     }
 
     public void escolherUmaTurma(Map.Entry<Disciplina, Turma> turmaEscolhida) {
+        Map<Disciplina, Turma> turmasEscolhidasAntigas = new HashMap<>(turmasEscolhidas);
+
         turmasEscolhidas.put(turmaEscolhida.getKey(), turmaEscolhida.getValue());
+
+        support.firePropertyChange("turmasEscolhidas", turmasEscolhidasAntigas, turmasEscolhidas);
     }
 
     // TODO: remover nome horrível
@@ -84,6 +88,7 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
 
     /**
      * Verifica se há algum conflito com as turmas escolhidas
+     *
      * @return true caso as turmas não tenham nenhum conflito, false caso contrário
      */
     public boolean validarTurmasEscolhidas() {
@@ -98,7 +103,7 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
 
-       conflitos.stream()
+        conflitos.stream()
                 .filter(ConflitoHorario::otimizavel)
                 .flatMap(conflitoHorario -> conflitoHorario.filtrarTurmasOtimizaveis().entrySet().stream())
                 .forEach(disciplinaTurmaEntry -> disciplinaTurmaEntry.getKey().removerTurmas(disciplinaTurmaEntry.getValue()));
@@ -133,7 +138,7 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
 
     public int getCargaHorariaTotalCreditos() {
         int cargaHoras = disciplinas.stream().map(Disciplina::getCargaHoraria).mapToInt(Integer::intValue).sum();
-        return (cargaHoras/15);
+        return (cargaHoras / 15);
     }
 
     @Override
@@ -176,15 +181,15 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
         return turmasEscolhidas;
     }
 
+    public void setTurmasEscolhidas(Map<Disciplina, Turma> turmasEscolhidas) {
+        this.turmasEscolhidas = turmasEscolhidas;
+    }
+
     // TODO: fazer o turmas escolhidas ser um Map<Disciplina, Set<Turma>> para deixar o código mais generalizado
     public Map<Disciplina, Set<Turma>> getTurmasEscolhidasSet() {
         return turmasEscolhidas
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> Set.of(entry.getValue())));
-    }
-
-    public void setTurmasEscolhidas(Map<Disciplina, Turma> turmasEscolhidas) {
-        this.turmasEscolhidas = turmasEscolhidas;
     }
 }
