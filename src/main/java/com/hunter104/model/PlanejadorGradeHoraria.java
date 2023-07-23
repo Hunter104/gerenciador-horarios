@@ -12,10 +12,12 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
     private static final int ADICIONAR = 0;
     private static final int REMOVER = 1;
     private Set<ConflitoHorario> conflitos;
+    private Map<Disciplina, Turma> turmasEscolhidas;
 
     public PlanejadorGradeHoraria() {
         disciplinas = new HashSet<>();
         conflitos = new HashSet<>();
+        turmasEscolhidas = new HashMap<>();
         support = new PropertyChangeSupport(this);
     }
 
@@ -56,6 +58,18 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
 
         support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+    }
+
+    public void escolherUmaTurma(Map<Disciplina, Turma> turmaEscolhida) {
+        turmasEscolhidas.putAll(turmaEscolhida);
+    }
+
+    /**
+     * Verifica se há algum conflito com as turmas escolhidas
+     * @return true caso as turmas não tenham nenhum conflito, false caso contrário
+     */
+    public boolean validarTurmasEscolhidas() {
+        return ConflitoHorario.checarPorConflitos(turmasEscolhidas).size() > 0;
     }
 
     /**
@@ -139,5 +153,13 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener{
 
     public Set<ConflitoHorario> getConflitos() {
         return conflitos;
+    }
+
+    public Map<Disciplina, Turma> getTurmasEscolhidas() {
+        return turmasEscolhidas;
+    }
+
+    public void setTurmasEscolhidas(Map<Disciplina, Turma> turmasEscolhidas) {
+        this.turmasEscolhidas = turmasEscolhidas;
     }
 }
