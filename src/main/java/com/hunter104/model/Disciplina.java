@@ -6,22 +6,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Disciplina {
+    private static final int ADICIONAR = 0;
+    private static final int REMOVER = 1;
+    private final PropertyChangeSupport support;
     private String nome;
     private int cargaHoraria;
     private Set<Turma> turmas;
     private String abreviacao;
     private String codigo;
-    private final PropertyChangeSupport support;
-    private static final int ADICIONAR = 0;
-    private static final int REMOVER = 1;
-
-    public void addPropertyChangeListener(PropertyChangeListener pcl) {
-        support.addPropertyChangeListener(pcl);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener pcl) {
-        support.removePropertyChangeListener(pcl);
-    }
 
     public Disciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
         this.codigo = codigo;
@@ -30,6 +22,14 @@ public class Disciplina {
         this.cargaHoraria = cargaHoraria;
         this.turmas = new HashSet<>();
         support = new PropertyChangeSupport(this);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        support.addPropertyChangeListener(pcl);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener pcl) {
+        support.removePropertyChangeListener(pcl);
     }
 
     public void adicionarTurma(int id, String professor, String salas, String horarioCodificado) {
@@ -106,19 +106,6 @@ public class Disciplina {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Disciplina that = (Disciplina) o;
-        return cargaHoraria == that.cargaHoraria && Objects.equals(nome, that.nome) && Objects.equals(turmas, that.turmas);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(nome, cargaHoraria, turmas);
-    }
-
     public String getNome() {
         return nome;
     }
@@ -134,6 +121,7 @@ public class Disciplina {
     public void setCargaHoraria(int cargaHoraria) {
         this.cargaHoraria = cargaHoraria;
     }
+
     public Set<Turma> getTurmas() {
         return turmas;
     }

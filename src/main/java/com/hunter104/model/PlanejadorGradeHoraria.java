@@ -156,18 +156,6 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PlanejadorGradeHoraria that = (PlanejadorGradeHoraria) o;
-        return Objects.equals(disciplinas, that.disciplinas) && Objects.equals(conflitos, that.conflitos);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(disciplinas, conflitos);
-    }
 
     public Set<Disciplina> getDisciplinas() {
         return disciplinas;

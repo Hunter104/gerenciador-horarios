@@ -37,19 +37,6 @@ public class Turma {
         return turmas.stream().anyMatch(this::conflitaComTurma);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Turma turma = (Turma) o;
-        return id == turma.id && Objects.equals(professor, turma.professor) && Objects.equals(horario, turma.horario);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, professor, horario);
-    }
-
     public int getId() {
         return id;
     }
