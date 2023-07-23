@@ -58,7 +58,10 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Tu
                                 .stream()
                                 .filter(turma -> turma.getHorario().temInterseccao(dia, hora))
                                 .collect(Collectors.toSet()))
-                );
+                ).entrySet()
+                        .stream()
+                        .filter(entry -> !entry.getValue().isEmpty())
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return getConflitoHorario(dia, hora, turmasIntercedentes);
     }
 
