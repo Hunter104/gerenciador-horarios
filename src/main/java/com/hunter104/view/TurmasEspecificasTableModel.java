@@ -7,6 +7,7 @@ import com.hunter104.model.Turma;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.text.html.Option;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TurmasEspecificasTableModel extends AbstractTurmaTableModel {
     Map<Disciplina, Set<Turma>> turmas;
@@ -17,7 +18,7 @@ public class TurmasEspecificasTableModel extends AbstractTurmaTableModel {
 
     @Override
     public int getRowCount() {
-        return turmas.size();
+        return turmas.values().stream().mapToInt(Set::size).sum();
     }
 
 
