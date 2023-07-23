@@ -30,7 +30,7 @@ public class Turma {
     }
 
     public boolean conflitaComTurma(Turma turma) {
-        return turma.getHorario().temInterseccao(turma.getHorario());
+        return turma.getHorario().temInterseccao(this.getHorario());
     }
 
     public boolean conflitaComTurmas(Collection<Turma> turmas) {
