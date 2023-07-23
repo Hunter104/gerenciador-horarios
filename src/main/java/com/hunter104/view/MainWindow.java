@@ -42,6 +42,8 @@ public class MainWindow implements PropertyChangeListener {
     private final PlanejadorGradeHoraria planejador;
     private final ConflitosTableModel conflitosTableModel;
     private final TurmasEspecificasTableModel turmasConflitoTableModel;
+    private final TurmasEspecificasTableModel turmasPossiveisTableModel;
+    private final TurmasEspecificasTableModel turmasEscolhidasTableModel;
 
     public MainWindow() {
 
@@ -62,6 +64,12 @@ public class MainWindow implements PropertyChangeListener {
 
         turmasConflitoTableModel = new TurmasEspecificasTableModel(new HashMap<>());
         turmasConflitoTable.setModel(turmasConflitoTableModel);
+
+        turmasPossiveisTableModel = new TurmasEspecificasTableModel(planejador.getTurmasEscolhiveis());
+        turmasPossiveisTable.setModel(turmasPossiveisTableModel);
+
+        turmasEscolhidasTableModel = new TurmasEspecificasTableModel(planejador.getTurmasEscolhidasSet());
+        turmasEscolhidasTable.setModel(turmasEscolhidasTableModel);
 
         // Botões
         adicionarDisciplinaButton.addActionListener(e ->
