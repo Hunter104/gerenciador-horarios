@@ -1,56 +1,75 @@
 package com.hunter104.model;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class PlanejadorGradeHoraria {
+public class PlanejadorGradeHoraria implements PropertyChangeListener{
     private final Set<Disciplina> disciplinas;
+    private final PropertyChangeSupport support;
+    private static final int ADICIONAR = 0;
+    private static final int REMOVER = 1;
     private Set<ConflitoHorario> conflitos;
+    private Map<Disciplina, Turma> turmasEscolhidas;
 
     public PlanejadorGradeHoraria() {
         disciplinas = new HashSet<>();
         conflitos = new HashSet<>();
+        turmasEscolhidas = new HashMap<>();
+        support = new PropertyChangeSupport(this);
     }
 
-    public void adicionarDisciplina(String nome, int cargaHoraria) {
-        Disciplina disciplina = new Disciplina(nome, cargaHoraria);
-        disciplinas.add(disciplina);
-        atualizarConflitos();
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        support.addPropertyChangeListener(pcl);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener pcl) {
+        support.removePropertyChangeListener(pcl);
+    }
+
+    public void adicionarDisciplina(String codigo, String nome, String abreviacao, int cargaHoraria) {
+        adicionarDisciplina(new Disciplina(codigo, nome, abreviacao,cargaHoraria));
+    }
+
+    public void adicionarDisciplina(Disciplina disciplina) {
+        disciplina.addPropertyChangeListener(this);
+        operareNotificar(disciplina, ADICIONAR);
     }
 
     public void removerDisciplina(String nome) {
-        disciplinas.removeIf(disciplina -> disciplina.getNome().equals(nome));
-        atualizarConflitos();
+        removerDisciplina(getDisciplina(nome));
     }
 
-    public Disciplina getDisciplina(String nome) {
-        return disciplinas.stream().filter(disciplina -> disciplina.getNome().equals(nome)).findFirst().orElseThrow();
+    public void removerDisciplina(Disciplina disciplina) {
+        operareNotificar(disciplina, REMOVER);
     }
 
-    public void adicionarTurma(String nomeDisciplina, int id, String professor, String horarioCodificado) {
-        Turma turma = new Turma(id, professor, horarioCodificado);
-        getDisciplina(nomeDisciplina).adicionarTurma(turma);
-        atualizarConflitos();
-    }
+    private void operareNotificar(Disciplina disciplina, int operacao) {
 
-    public void removerTurma(String nomeDisciplina, int id) {
-        getDisciplina(nomeDisciplina).removerTurma(id);
-        atualizarConflitos();
-    }
+        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
+        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
 
-    public Turma getTurma(String nomeDisciplina, int id) {
-        return getDisciplina(nomeDisciplina).getTurma(id);
-    }
-
-    public boolean existemDisciplinasInalcancaveis() {
-        for (ConflitoHorario conflito : conflitos) {
-            if (conflito.isOtimizavel()) {
-                return true;
-            }
+        switch (operacao) {
+            case ADICIONAR -> disciplinas.add(disciplina);
+            case REMOVER -> disciplinas.remove(disciplina);
         }
-        return false;
+
+        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
+        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+    }
+
+    public void escolherUmaTurma(Map<Disciplina, Turma> turmaEscolhida) {
+        turmasEscolhidas.putAll(turmaEscolhida);
+    }
+
+    /**
+     * Verifica se há algum conflito com as turmas escolhidas
+     * @return true caso as turmas não tenham nenhum conflito, false caso contrário
+     */
+    public boolean validarTurmasEscolhidas() {
+        return ConflitoHorario.checarPorConflitos(turmasEscolhidas).size() > 0;
     }
 
     /**
@@ -58,62 +77,54 @@ public class PlanejadorGradeHoraria {
      * para a disciplina, a única opção é remover as outras turmas do conflito.
      */
     public void removerTurmasInalcancaveis() {
-        for (ConflitoHorario conflito : conflitos) {
-            if (conflito.isOtimizavel()) {
-                Map<Disciplina, Integer> turmasOtimizaveis = conflito.filtrarTurmasOtimizaveis();
-                for (Map.Entry<Disciplina, Integer> turmaEntry : turmasOtimizaveis.entrySet()) {
-                    Disciplina disciplina = turmaEntry.getKey();
-                    disciplina.removerTurma(turmaEntry.getValue());
-                }
-            }
-        }
+        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
+        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
 
-        // Se depois das alterações algumas turmas se tornarem inalcançáveis, chamar a função novamente.
+       conflitos.stream()
+                .filter(ConflitoHorario::otimizavel)
+                .flatMap(conflitoHorario -> conflitoHorario.filtrarTurmasOtimizaveis().entrySet().stream())
+                .forEach(disciplinaTurmaEntry -> disciplinaTurmaEntry.getKey().removerTurmas(disciplinaTurmaEntry.getValue()));
+
         atualizarConflitos();
         if (existemDisciplinasInalcancaveis()) {
             removerTurmasInalcancaveis();
         }
+        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
+        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
     }
 
-    /**
-     * Tenta criar uma grade horária com as turmas escolhidas,
-     * disciplinas com turmas únicas são opcionais
-     *
-     * @param turmasEscolhidas turmas escolhidas para montar a grade
-     * @return Um objeto representando a grade horária
-     */
-    public GradeHoraria criarGradeHoraria(Map<Disciplina, Integer> turmasEscolhidas) {
-        Set<Disciplina> disciplinasEscolhidas = criarDisciplinasComTurmas(turmasEscolhidas);
-        return new GradeHoraria(disciplinasEscolhidas);
-    }
-
-    /**
-     * Cria uma cópia das disciplinas contendo apenas as turmas escolhidas
-     * @param turmasEscolhidas turmas escolhidas para copiar
-     * @return um conjunto com uma cópia das disciplinas contendo apenas as turmas escolhidas
-     */
-    private Set<Disciplina> criarDisciplinasComTurmas(Map<Disciplina, Integer> turmasEscolhidas) {
-        Set<Disciplina> disciplinas = new HashSet<>();
-        for (Map.Entry<Disciplina, Integer> turmaEntry : turmasEscolhidas.entrySet()) {
-            Disciplina disciplinaAtual = turmaEntry.getKey();
-            Turma turmaAtual = disciplinaAtual.getTurma(turmaEntry.getValue());
-            Disciplina disciplinaCopiada = new Disciplina(
-                    disciplinaAtual.getNome(),
-                    disciplinaAtual.getAbreviacao(),
-                    disciplinaAtual.getCargaHoraria());
-            disciplinaCopiada.adicionarTurma(
-                    turmaAtual.getId(),
-                    turmaAtual.getProfessor(),
-                    turmaAtual.getHorario()
-            );
-            disciplinas.add(disciplinaCopiada);
-        }
-        return disciplinas;
+    public boolean existemDisciplinasInalcancaveis() {
+        return conflitos.stream().anyMatch(ConflitoHorario::otimizavel);
     }
 
     public void atualizarConflitos() {
         conflitos = ConflitoHorario.checarPorConflitos(disciplinas);
     }
+
+    public Disciplina getDisciplina(String nome) {
+        return disciplinas.stream().filter(disciplina -> disciplina.getNome().equals(nome)).findFirst().orElseThrow();
+    }
+
+    public List<Disciplina> getDisciplinasOrdemAlfabetica() {
+        return disciplinas.stream().sorted(Comparator.comparing(Disciplina::getNome)).toList();
+    }
+
+    public int getCargaHorariaTotalHoras() {
+        return disciplinas.stream().map(Disciplina::getCargaHoraria).mapToInt(Integer::intValue).sum();
+    }
+
+    public int getCargaHorariaTotalCreditos() {
+        int cargaHoras = disciplinas.stream().map(Disciplina::getCargaHoraria).mapToInt(Integer::intValue).sum();
+        return (cargaHoras/15);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (Objects.equals(evt.getPropertyName(), "turmas")) {
+            atualizarConflitos();
+        }
+    }
+
 
     @Override
     public String toString() {
@@ -142,5 +153,21 @@ public class PlanejadorGradeHoraria {
 
     public Set<ConflitoHorario> getConflitos() {
         return conflitos;
+    }
+
+    public Map<Disciplina, Turma> getTurmasEscolhidas() {
+        return turmasEscolhidas;
+    }
+
+    // TODO: fazer o turmas escolhidas ser um Map<Disciplina, Set<Turma>> para deixar o código mais generalizado
+    public Map<Disciplina, Set<Turma>> getTurmasEscolhidasSet() {
+        return turmasEscolhidas
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Set.of(entry.getValue())));
+    }
+
+    public void setTurmasEscolhidas(Map<Disciplina, Turma> turmasEscolhidas) {
+        this.turmasEscolhidas = turmasEscolhidas;
     }
 }

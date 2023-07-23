@@ -9,7 +9,7 @@ public record GradeHoraria(Set<Disciplina> disciplinas) {
     public GradeHoraria {
         Set<ConflitoHorario> conflitosPossiveis = ConflitoHorario.checarPorConflitos(disciplinas);
         boolean umaTurmaSomente = disciplinas.stream().allMatch(Disciplina::isTurmaUnica);
-        if (conflitosPossiveis != null) {
+        if (conflitosPossiveis.size() > 0) {
             throw new IllegalArgumentException("Algumas das turmas escolhidas tem horários conflitantes");
         }
         if (!umaTurmaSomente) {

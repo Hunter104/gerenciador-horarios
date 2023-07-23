@@ -3,20 +3,20 @@ package com.hunter104.model;
 import java.util.Objects;
 
 public class Turma {
-    private final int id;
-    private final String professor;
-    private final Horario horario;
+    private int id;
+    private String professor;
+    private Horario horario;
+    private String salas;
 
-    public Turma(int id, String professor, Horario horario) {
+    public Turma(int id, String professor, String salas, Horario horario) {
         this.id = id;
         this.professor = professor;
         this.horario = horario;
+        this.salas = salas;
     }
 
-    public Turma(int id, String professor, String horarioCodificado) {
-        this.id = id;
-        this.professor = professor;
-        this.horario = new Horario(horarioCodificado);
+    public Turma(int id, String professor, String salas, String horarioCodificado) {
+        this(id, professor, salas, Horario.criarFromCodigo(horarioCodificado));
     }
 
     @Override
@@ -45,11 +45,31 @@ public class Turma {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getProfessor() {
         return professor;
     }
 
+    public void setProfessor(String professor) {
+        this.professor = professor;
+    }
+
     public Horario getHorario() {
         return horario;
+    }
+
+    public void setHorario(Horario horario) {
+        this.horario = horario;
+    }
+
+    public String getSalas() {
+        return salas;
+    }
+
+    public void setSalas(String salas) {
+        this.salas = salas;
     }
 }
