@@ -152,8 +152,15 @@ public class MainWindow implements PropertyChangeListener {
                 crudTurmasModel.setDisciplinas(novasDisciplinas);
 
                 chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
+
+                turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
             }
-            case "turmas" -> crudTurmasModel.atualizarDados();
+            case "turmas" -> {
+                crudTurmasModel.atualizarDados();
+                turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
+            }
             case "conflitos" -> {
                 conflitosTableModel.setConflitos(planejador.getConflitos());
                 turmasConflitoTableModel.setTurmas(new HashMap<>());
