@@ -51,14 +51,18 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener {
 
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+        Map<Disciplina, Turma> turmasEscolhidasAntigas = new HashMap<>(turmasEscolhidas);
 
         switch (operacao) {
             case ADICIONAR -> disciplinas.add(disciplina);
             case REMOVER -> disciplinas.remove(disciplina);
         }
+        atualizarConflitos();
+        atualizarTurmasEscolhidas();
 
         support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+        support.firePropertyChange("turmasEscolhidas", turmasEscolhidasAntigas, turmasEscolhidas);
     }
 
     public void escolherUmaTurma(Map.Entry<Disciplina, Turma> turmaEscolhida) {
@@ -86,6 +90,16 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener {
                 );
     }
 
+    private void atualizarTurmasEscolhidas() {
+        Set<Turma> todasAsTurmas = disciplinas
+                .stream()
+                .flatMap(disciplina -> disciplina.getTurmas().stream())
+                .collect(Collectors.toSet());
+        turmasEscolhidas = turmasEscolhidas.entrySet().stream()
+                .filter(entry -> disciplinas.contains(entry.getKey()) && todasAsTurmas.contains(entry.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     /**
      * Verifica se há algum conflito com as turmas escolhidas
      *
@@ -109,6 +123,7 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener {
                 .forEach(disciplinaTurmaEntry -> disciplinaTurmaEntry.getKey().removerTurmas(disciplinaTurmaEntry.getValue()));
 
         atualizarConflitos();
+        atualizarTurmasEscolhidas();
         if (existemDisciplinasInalcancaveis()) {
             removerTurmasInalcancaveis();
         }
@@ -145,6 +160,7 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         if (Objects.equals(evt.getPropertyName(), "turmas")) {
             atualizarConflitos();
+            atualizarTurmasEscolhidas();
         }
     }
 
