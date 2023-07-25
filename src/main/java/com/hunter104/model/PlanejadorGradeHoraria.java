@@ -75,19 +75,17 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener {
 
     // TODO: remover nome horrível
     public Map<Disciplina, Set<Turma>> getTurmasEscolhiveis() {
-        Set<Turma> turmasEscolhidasSet = new HashSet<>(turmasEscolhidas.values());
-        Set<Disciplina> disciplinasEscolhidas = new HashSet<>(turmasEscolhidas.keySet());
+        Set<Disciplina> disciplinasEscolhidas = turmasEscolhidas.keySet();
         return disciplinas.stream()
                 .filter(Predicate.not(disciplinasEscolhidas::contains))   // Filtrar disciplinas que não foram escolhidas
-                .collect(Collectors.toMap(                  // Criar um mapa com
-                                disciplina -> disciplina,   // discicplinas filtradas
-                                disciplina -> disciplina    // turmas sem conflito com as turmas escolhidas
-                                        .getTurmas()
-                                        .stream()
-                                        .filter(turma -> !turma.conflitaComTurmas(turmasEscolhidasSet))
-                                        .collect(Collectors.toSet())
-                        )
-                );
+                .collect(Collectors.toMap(disciplina -> disciplina, this::filtrarTurmasSemConflito));
+    }
+
+    private Set<Turma> filtrarTurmasSemConflito(Disciplina disciplina) {
+        return disciplina.getTurmas()
+                .stream()
+                .filter(turma -> !turma.conflitaComTurmas(turmasEscolhidas.values()))
+                .collect(Collectors.toSet());
     }
 
     private void atualizarTurmasEscolhidas() {
