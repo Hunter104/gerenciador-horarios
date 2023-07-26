@@ -2,13 +2,11 @@ package com.hunter104.view;
 
 import com.hunter104.model.ConflitoHorario;
 import com.hunter104.model.Disciplina;
-import com.hunter104.model.PlanejadorGradeHoraria;
+import com.hunter104.model.PlanodeGrade;
 import com.hunter104.model.Turma;
 
 import javax.swing.*;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
@@ -18,7 +16,7 @@ import static com.hunter104.Main.criarPlanejadorComDados;
 public class MainWindow implements PropertyChangeListener {
     private final DisciplinasTableModel crudDisciplinasModel;
     private final TurmasTableModel crudTurmasModel;
-    private final PlanejadorGradeHoraria planejador;
+    private final PlanodeGrade planejador;
     private final ConflitosTableModel conflitosTableModel;
     private final TurmasEspecificasTableModel turmasConflitoTableModel;
     private final TurmasEspecificasTableModel turmasPossiveisTableModel;
@@ -46,6 +44,7 @@ public class MainWindow implements PropertyChangeListener {
     private JPanel visualizarHorarioConflitoPanel;
     private JPanel VisualizarTurmaConflitoPanel;
     private JPanel controlPanel;
+    private JLabel otimizavelLabel;
 
     public MainWindow() {
 
@@ -100,7 +99,9 @@ public class MainWindow implements PropertyChangeListener {
             conflitosTableModel.getConflito(row, column).ifPresent(conflito -> {
                 turmasConflitoTableModel.setTurmas(conflito.turmas());
                 conflitoEscolhidoLabel.setText(formatarConflito(conflito));
+                otimizavelLabel.setText(conflito.otimizavel() ? "Sim" : "Não");
             });
+
         });
         otimizarButton.addActionListener(e -> planejador.removerTurmasInalcancaveis());
 
