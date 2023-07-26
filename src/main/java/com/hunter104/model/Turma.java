@@ -29,6 +29,10 @@ public class Turma {
                 '}';
     }
 
+    public boolean temInterseccao(DiadaSemana dia, Hora hora) {
+        return horario.temInterseccao(dia, hora);
+    }
+
     public boolean conflitaComTurma(Turma turma) {
         return turma.getHorario().temInterseccao(this.getHorario());
     }

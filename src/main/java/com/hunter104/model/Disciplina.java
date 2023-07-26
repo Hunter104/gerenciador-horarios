@@ -93,6 +93,21 @@ public class Disciplina {
         return true;
     }
 
+    /**
+     * Verifica se alguma das turmas dessa disciplina tem intersecção com o horário escolhida
+     *
+     * @param dia  dia escolhido
+     * @param hora hora escolhida
+     * @return true se qualquer turma tiver um horário no bloco escolhido, falso caso contrário
+     */
+    public boolean temTurmaIntercedente(DiadaSemana dia, Hora hora) {
+        return turmas.stream().anyMatch(turma -> turma.temInterseccao(dia, hora));
+    }
+
+    public Set<Turma> filtrarTurmasIntercedentes(DiadaSemana dia, Hora hora) {
+        return turmas.stream().filter(turma -> turma.temInterseccao(dia, hora)).collect(Collectors.toSet());
+    }
+
     public List<Turma> getTurmasPorId() {
         return turmas.stream().sorted(Comparator.comparing(Turma::getId)).toList();
     }

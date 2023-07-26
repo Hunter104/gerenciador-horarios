@@ -1,11 +1,12 @@
 package com.hunter104.view;
 
-import com.hunter104.model.PlanejadorGradeHoraria;
+import com.hunter104.model.PlanodeGrade;
 
 import javax.swing.*;
 import java.awt.event.*;
 
 public class AdicionarDisciplina extends JDialog {
+    private final PlanodeGrade planejador;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -13,9 +14,8 @@ public class AdicionarDisciplina extends JDialog {
     private JTextField nomeField;
     private JTextField abreviacaoField;
     private JTextField cargaHorariaField;
-    private final PlanejadorGradeHoraria planejador;
 
-    public AdicionarDisciplina(PlanejadorGradeHoraria planejador) {
+    public AdicionarDisciplina(PlanodeGrade planejador) {
         this.planejador = planejador;
         setContentPane(contentPane);
         setModal(true);

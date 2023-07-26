@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class PlanejadorGradeHoraria implements PropertyChangeListener {
+public class PlanodeGrade implements PropertyChangeListener {
     private static final int ADICIONAR = 0;
     private static final int REMOVER = 1;
     private final Set<Disciplina> disciplinas;
@@ -15,7 +15,7 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener {
     private Set<ConflitoHorario> conflitos;
     private Map<Disciplina, Turma> turmasEscolhidas;
 
-    public PlanejadorGradeHoraria() {
+    public PlanodeGrade() {
         disciplinas = new HashSet<>();
         conflitos = new HashSet<>();
         turmasEscolhidas = new HashMap<>();
@@ -114,16 +114,14 @@ public class PlanejadorGradeHoraria implements PropertyChangeListener {
     public void removerTurmasInalcancaveis() {
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+        while (existemDisciplinasInalcancaveis()) {
+            conflitos.stream()
+                    .filter(ConflitoHorario::otimizavel)
+                    .flatMap(conflitoHorario -> conflitoHorario.filtrarTurmasOtimizaveisPorDisciplina().entrySet().stream())
+                    .forEach(disciplinaTurmaEntry -> disciplinaTurmaEntry.getKey().removerTurmas(disciplinaTurmaEntry.getValue()));
 
-        conflitos.stream()
-                .filter(ConflitoHorario::otimizavel)
-                .flatMap(conflitoHorario -> conflitoHorario.filtrarTurmasOtimizaveis().entrySet().stream())
-                .forEach(disciplinaTurmaEntry -> disciplinaTurmaEntry.getKey().removerTurmas(disciplinaTurmaEntry.getValue()));
-
-        atualizarConflitos();
-        atualizarTurmasEscolhidas();
-        if (existemDisciplinasInalcancaveis()) {
-            removerTurmasInalcancaveis();
+            atualizarConflitos();
+            atualizarTurmasEscolhidas();
         }
         support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);

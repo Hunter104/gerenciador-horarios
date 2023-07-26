@@ -9,14 +9,13 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ExportToCSV {
     public static void exportarGradeParaCSV(Map<Disciplina, Turma> turmas) {
         criarCSVTurmas(turmas);
     }
 
-    public static void exportarTurmasPlanejadas(PlanejadorGradeHoraria planos) {
+    public static void exportarTurmasPlanejadas(PlanodeGrade planos) {
         String[] headers = {"Disciplina", "Turma", "Professor"};
         CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
                 .setDelimiter(';')

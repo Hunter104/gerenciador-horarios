@@ -1,7 +1,7 @@
 package com.hunter104.view;
 
 import com.hunter104.model.Disciplina;
-import com.hunter104.model.PlanejadorGradeHoraria;
+import com.hunter104.model.PlanodeGrade;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -18,7 +18,7 @@ public class AdicionarTurma extends JDialog {
     private JTextField horarioField;
     private JTextField salaField;
 
-    public AdicionarTurma(PlanejadorGradeHoraria planejador) {
+    public AdicionarTurma(PlanodeGrade planejador) {
 
         disciplinaBox.setRenderer(new DisciplinasRenderer());
         List<Disciplina> disciplinas = planejador.getDisciplinasOrdemAlfabetica();
