@@ -77,14 +77,14 @@ public abstract class AbstractTurmaTableModel extends AbstractTableModel {
     public String getColumnName(int columnIndex) {
         return Arrays.stream(Coluna.values())
                 .filter(coluna -> coluna.num == columnIndex)
-                .map(Coluna::nome)
+                .map(coluna -> coluna.nome)
                 .findFirst()
                 .orElseThrow();
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (columnIndex == Coluna.ID.num()) {
+        if (columnIndex == Coluna.ID.num) {
             return Integer.class;
         }
         return String.class;
@@ -108,12 +108,12 @@ public abstract class AbstractTurmaTableModel extends AbstractTableModel {
             this.nome = nome;
         }
 
-        public String nome() {
-            return nome;
-        }
-
         public int num() {
             return num;
+        }
+
+        public String nome() {
+            return nome;
         }
     }
 }

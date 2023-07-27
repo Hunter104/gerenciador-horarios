@@ -26,7 +26,7 @@ public class ConflitosTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int columnIndex) {
-        return getColuna(columnIndex).map(Coluna::nome).orElseThrow();
+        return getColuna(columnIndex).map(coluna -> coluna.nome).orElseThrow();
     }
 
     private Optional<Coluna> getColuna(int column) {
@@ -102,14 +102,6 @@ public class ConflitosTableModel extends AbstractTableModel {
         Coluna(String nome, int num) {
             this.num = num;
             this.nome = nome;
-        }
-
-        public String nome() {
-            return nome;
-        }
-
-        public int num() {
-            return num;
         }
     }
 }
