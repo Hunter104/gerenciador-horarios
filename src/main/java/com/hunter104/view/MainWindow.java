@@ -4,6 +4,7 @@ import com.hunter104.model.ConflitoHorario;
 import com.hunter104.model.Disciplina;
 import com.hunter104.model.PlanodeGrade;
 import com.hunter104.model.Turma;
+import com.sun.net.httpserver.Headers;
 
 import javax.swing.*;
 
@@ -73,47 +74,72 @@ public class MainWindow implements PropertyChangeListener {
         turmasEscolhidasTable.setModel(turmasEscolhidasTableModel);
 
         // Botões
-        adicionarDisciplinaButton.addActionListener(e ->
-                mostrarDialogo(new AdicionarDisciplina(planejador), "Cadastrar nova disciplina")
-        );
-        removerDisciplinaButton.addActionListener(e -> planejador.removerDisciplina(
-                crudDisciplinasModel.getDisciplina(disciplinasCrudTable.getSelectedRow())
-        ));
+        adicionarDisciplinaButton.addActionListener(e -> adicionarDisciplina());
+        removerDisciplinaButton.addActionListener(e -> removerDisicplina());
 
-        adicionarTurmaButton.addActionListener(e ->
-                mostrarDialogo(new AdicionarTurma(planejador), "Cadastrar nova turma")
-        );
-        removerTurmaButton.addActionListener(e -> {
-            int row = turmasCrudTable.getSelectedRow();
-            Optional<Turma> turmaEscolhida = crudTurmasModel.getTurma(row);
-            Optional<Disciplina> disciplinaEscolhida = crudTurmasModel.getDisciplina(row);
-            turmaEscolhida.ifPresent(turma ->
-                    disciplinaEscolhida.ifPresent(disciplina -> disciplina.removerTurma(turma))
-            );
-        });
+        adicionarTurmaButton.addActionListener(e -> adicionarTurma());
+        removerTurmaButton.addActionListener(e -> removerTurma());
 
-        // TODO: trocar null checks por optionals
-        visualizarConflitoButton.addActionListener(e -> {
-            int row = horarioConflitoTable.getSelectedRow();
-            int column = horarioConflitoTable.getSelectedColumn();
-            conflitosTableModel.getConflito(row, column).ifPresent(conflito -> {
-                turmasConflitoTableModel.setTurmas(conflito.turmas());
-                conflitoEscolhidoLabel.setText(formatarConflito(conflito));
-                otimizavelLabel.setText(conflito.otimizavel() ? "Sim" : "Não");
-            });
-
-        });
+        visualizarConflitoButton.addActionListener(e -> visualizarConflito());
         otimizarButton.addActionListener(e -> planejador.removerTurmasInalcancaveis());
+
+        escolherTurmaButton.addActionListener(e -> escolherTurma());
 
         // Labels
         chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
-        disciplinasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
-        turmasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
 
-        escolherTurmaButton.addActionListener(e -> {
-            int row = turmasPossiveisTable.getSelectedRow();
-            Optional<Map.Entry<Disciplina, Turma>> turmaEscolhida = turmasPossiveisTableModel.getElemento(row);
-            turmaEscolhida.ifPresent(planejador::escolherUmaTurma);
+        setLabelHeader(disciplinasTituloLabel, Header.H1);
+        setLabelHeader(turmasTituloLabel, Header.H1);
+    }
+
+    private void setLabelHeader(JLabel label, Header header) {
+        label.putClientProperty("FlatLaf.styleClass", header.code);
+    }
+
+    private void setLabelStyle(JLabel label, FontStyle style) {
+        label.putClientProperty("FlatLaf.styleClass", style.code);
+    }
+
+    private void setLabelSize(JLabel label, FontSize size) {
+        label.putClientProperty("FlatLaf.styleClass", size.code);
+    }
+
+    private void adicionarTurma() {
+        mostrarDialogo(new AdicionarTurma(planejador), "Cadastrar nova turma");
+    }
+
+    private void adicionarDisciplina() {
+        mostrarDialogo(new AdicionarDisciplina(planejador), "Cadastrar nova disciplina");
+    }
+
+    private void removerDisicplina() {
+        int linhaEscolhida = disciplinasCrudTable.getSelectedRow();
+        Disciplina disciplinaSelecionada = crudDisciplinasModel.getDisciplina(linhaEscolhida);
+        planejador.removerDisciplina(disciplinaSelecionada);
+    }
+
+    private void escolherTurma() {
+        int row = turmasPossiveisTable.getSelectedRow();
+        Optional<Map.Entry<Disciplina, Turma>> turmaEscolhida = turmasPossiveisTableModel.getElemento(row);
+        turmaEscolhida.ifPresent(planejador::escolherUmaTurma);
+    }
+
+    private void removerTurma() {
+        int row = turmasCrudTable.getSelectedRow();
+        Optional<Turma> turmaEscolhida = crudTurmasModel.getTurma(row);
+        Optional<Disciplina> disciplinaEscolhida = crudTurmasModel.getDisciplina(row);
+        turmaEscolhida.ifPresent(turma ->
+                disciplinaEscolhida.ifPresent(disciplina -> disciplina.removerTurma(turma))
+        );
+    }
+
+    private void visualizarConflito() {
+        int row = horarioConflitoTable.getSelectedRow();
+        int column = horarioConflitoTable.getSelectedColumn();
+        conflitosTableModel.getConflito(row, column).ifPresent(conflito -> {
+            turmasConflitoTableModel.setTurmas(conflito.turmas());
+            conflitoEscolhidoLabel.setText(formatarConflito(conflito));
+            otimizavelLabel.setText(conflito.otimizavel() ? "Sim" : "Não");
         });
     }
 
@@ -173,4 +199,58 @@ public class MainWindow implements PropertyChangeListener {
             }
         }
     }
+
+    private enum Header {
+        H00("h00"),
+        H0("h0"),
+        H1("h1"),
+        H2("h2"),
+        H3("h3"),
+        H4("h4");
+        private final String code;
+
+        Header(String code) {
+            this.code = code;
+        }
+
+        public String code() {
+            return code;
+        }
+    }
+
+    private enum FontSize {
+        LARGE("large"),
+        DEFAULT("default"),
+        MEDIUM("medium"),
+        SMALL("small"),
+        Mini("mini");
+        private final String code;
+
+        FontSize(String code) {
+            this.code = code;
+        }
+
+        public String code() {
+            return code;
+        }
+    }
+
+    private enum FontStyle {
+        MONOSPACED("monospaced"),
+        LIGHT("light"),
+        SEMIBOLD("semibold");
+        private final String code;
+
+        FontStyle(String code) {
+            this.code = code;
+        }
+
+        public String code() {
+            return code;
+        }
+    }
+
 }
+
+
+
