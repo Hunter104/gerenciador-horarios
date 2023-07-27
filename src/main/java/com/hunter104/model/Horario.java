@@ -1,9 +1,6 @@
 package com.hunter104.model;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -65,8 +62,8 @@ public record Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodi
         return diasIntercedem && horasIntercedem;
     }
 
-    public <T> boolean conjuntosIntercedem(Set<T> primeiroConjunto, Set<T> segundoConjunto) {
-        Set<T> conjuntosIntercedentes = new HashSet<>(primeiroConjunto);
+    private <T extends Enum<T>> boolean conjuntosIntercedem(Collection<T> primeiroConjunto, Collection<T> segundoConjunto) {
+        Set<T> conjuntosIntercedentes = EnumSet.copyOf(primeiroConjunto);
         conjuntosIntercedentes.retainAll(segundoConjunto);
         return conjuntosIntercedentes.size() > 0;
     }
