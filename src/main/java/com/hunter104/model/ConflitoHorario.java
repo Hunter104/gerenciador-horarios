@@ -1,5 +1,6 @@
 package com.hunter104.model;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -91,17 +92,18 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Tu
     }
 
     public Optional<Map<Disciplina, Set<Turma>>> filtrarTurmasOtimizaveisPorDisciplina() {
-        if (isOtimizavel()) {
-            Disciplina horarioUnico = filtrarDisciplinasHorarioUnico().iterator().next();
-            return Optional.of(
-                    turmas.entrySet().stream()
-                            .filter(turmaEntry -> !turmaEntry.getKey().equals(horarioUnico))
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-            );
+        Set<Disciplina> disciplinasHorarioUnico = filtrarDisciplinasHorarioUnico();
+        if (disciplinasHorarioUnico.size() == 1) {
+            Disciplina horarioUnico = disciplinasHorarioUnico.iterator().next();
+            return turmas.entrySet()
+                    .stream()
+                    .filter(turmaEntry -> !turmaEntry.getKey().equals(horarioUnico))
+                    .collect(Collectors.collectingAndThen(
+                            Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue), Optional::of)
+                    );
         } else {
             return Optional.empty();
         }
-
     }
 
     public Set<Disciplina> filtrarDisciplinasHorarioUnico() {
