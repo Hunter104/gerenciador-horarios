@@ -148,10 +148,6 @@ public class PlanodeGrade implements PropertyChangeListener {
         return disciplinas.stream().filter(disciplina -> disciplina.getNome().equals(nome)).findFirst().orElseThrow();
     }
 
-    public List<Disciplina> getDisciplinasOrdemAlfabetica() {
-        return disciplinas.stream().sorted(Comparator.comparing(Disciplina::getNome)).toList();
-    }
-
     public int getCargaHorariaTotalHoras() {
         return disciplinas.stream().map(Disciplina::getCargaHoraria).mapToInt(Integer::intValue).sum();
     }

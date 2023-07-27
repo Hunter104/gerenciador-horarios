@@ -6,16 +6,13 @@ import com.hunter104.model.Turma;
 
 import javax.swing.plaf.OptionPaneUI;
 import javax.swing.table.AbstractTableModel;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class TurmasTableModel extends AbstractTurmaTableModel {
     List<Disciplina> disciplinas;
 
-    public TurmasTableModel(List<Disciplina> disciplinas) {
-        this.disciplinas = disciplinas;
+    public TurmasTableModel(Collection<Disciplina> disciplinas) {
+        this.disciplinas = ordenarDisciplinasAlfabeticamente(disciplinas);
     }
 
     @Override
@@ -74,8 +71,8 @@ public class TurmasTableModel extends AbstractTurmaTableModel {
         }
     }
 
-    public void setDisciplinas(List<Disciplina> disciplinas) {
-        this.disciplinas = disciplinas;
+    public void setDisciplinas(Collection<Disciplina> disciplinas) {
+        this.disciplinas = ordenarDisciplinasAlfabeticamente(disciplinas);
         fireTableDataChanged();
     }
 

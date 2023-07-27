@@ -55,10 +55,10 @@ public class MainWindow implements PropertyChangeListener {
         planejador.getDisciplinas().forEach(disciplina -> disciplina.addPropertyChangeListener(this));
 
         // Tabelas
-        crudDisciplinasModel = new DisciplinasTableModel(planejador.getDisciplinasOrdemAlfabetica());
+        crudDisciplinasModel = new DisciplinasTableModel(planejador.getDisciplinas());
         disciplinasCrudTable.setModel(crudDisciplinasModel);
 
-        crudTurmasModel = new TurmasTableModel(planejador.getDisciplinasOrdemAlfabetica());
+        crudTurmasModel = new TurmasTableModel(planejador.getDisciplinas());
         turmasCrudTable.setModel(crudTurmasModel);
 
         conflitosTableModel = new ConflitosTableModel(planejador.getConflitos());
@@ -173,7 +173,7 @@ public class MainWindow implements PropertyChangeListener {
             case "disciplinas" -> {
                 planejador.getDisciplinas().forEach(disciplina -> disciplina.addPropertyChangeListener(this));
 
-                List<Disciplina> novasDisciplinas = planejador.getDisciplinasOrdemAlfabetica();
+                Set<Disciplina> novasDisciplinas = planejador.getDisciplinas();
 
                 crudDisciplinasModel.setLinhas(novasDisciplinas);
                 crudTurmasModel.setDisciplinas(novasDisciplinas);

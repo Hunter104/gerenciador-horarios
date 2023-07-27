@@ -1,9 +1,12 @@
 package com.hunter104.view;
 
 import com.hunter104.model.Disciplina;
+import com.sun.source.doctree.SeeTree;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public class DisciplinasTableModel extends AbstractTableModel {
@@ -15,8 +18,12 @@ public class DisciplinasTableModel extends AbstractTableModel {
     private final String[] colunas = new String[]{"Código", "Nome",
             "Abreviação", "Carga horária"};
 
-    public DisciplinasTableModel(List<Disciplina> disciplinas) {
-        this.linhas = new ArrayList<>(disciplinas);
+    public DisciplinasTableModel(Collection<Disciplina> disciplinas) {
+        this.linhas = ordenarDisciplinasAlfabeticamente(disciplinas);
+    }
+
+    private List<Disciplina> ordenarDisciplinasAlfabeticamente(Collection<Disciplina> disciplinas) {
+        return disciplinas.stream().sorted(Comparator.comparing(Disciplina::getNome)).toList();
     }
 
     @Override
@@ -77,8 +84,8 @@ public class DisciplinasTableModel extends AbstractTableModel {
         return linhas.get(indiceLinha);
     }
 
-    public void setLinhas(List<Disciplina> linhas) {
-        this.linhas = linhas;
+    public void setLinhas(Collection<Disciplina> linhas) {
+        this.linhas = ordenarDisciplinasAlfabeticamente(linhas);
         fireTableDataChanged();
     }
 }

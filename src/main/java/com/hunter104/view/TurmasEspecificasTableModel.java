@@ -1,13 +1,9 @@
 package com.hunter104.view;
 
 import com.hunter104.model.Disciplina;
-import com.hunter104.model.Horario;
 import com.hunter104.model.Turma;
 
-import javax.swing.table.AbstractTableModel;
-import javax.swing.text.html.Option;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class TurmasEspecificasTableModel extends AbstractTurmaTableModel {
     Map<Disciplina, Set<Turma>> turmas;
@@ -24,9 +20,9 @@ public class TurmasEspecificasTableModel extends AbstractTurmaTableModel {
     @Override
     public Optional<Map.Entry<Disciplina, Turma>> getElemento(int row) {
         int linhaAtual = 0;
-        List<Disciplina> disciplinasAlfabeticas = turmas.keySet().stream().sorted(Comparator.comparing(Disciplina::getNome)).toList();
+        List<Disciplina> disciplinasAlfabeticas = ordenarDisciplinasAlfabeticamente(turmas.keySet());
         for (Disciplina disciplina : disciplinasAlfabeticas) {
-            for (Turma turma : getTurmasOrdemId(disciplina)) {
+            for (Turma turma : ordenarTurmasPorId(disciplina)) {
                 if (linhaAtual == row) {
                     return Optional.of(Map.entry(disciplina, turma));
                 }
@@ -36,7 +32,8 @@ public class TurmasEspecificasTableModel extends AbstractTurmaTableModel {
         return Optional.empty();
     }
 
-    private List<Turma> getTurmasOrdemId(Disciplina disciplina) {
+
+    private List<Turma> ordenarTurmasPorId(Disciplina disciplina) {
         return turmas.get(disciplina).stream().sorted(Comparator.comparing(Turma::getId)).toList();
     }
 

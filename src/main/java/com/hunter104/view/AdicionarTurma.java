@@ -5,6 +5,7 @@ import com.hunter104.model.PlanodeGrade;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,7 +22,10 @@ public class AdicionarTurma extends JDialog {
     public AdicionarTurma(PlanodeGrade planejador) {
 
         disciplinaBox.setRenderer(new DisciplinasRenderer());
-        List<Disciplina> disciplinas = planejador.getDisciplinasOrdemAlfabetica();
+        List<Disciplina> disciplinas = planejador.
+                getDisciplinas()
+                .stream()
+                .sorted(Comparator.comparing(Disciplina::getNome)).toList();
         disciplinas.forEach(disciplina -> disciplinaBox.addItem(disciplina));
 
         setContentPane(contentPane);

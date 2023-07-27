@@ -5,9 +5,7 @@ import com.hunter104.model.Turma;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.text.html.Option;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class AbstractTurmaTableModel extends AbstractTableModel {
     @Override
@@ -22,6 +20,10 @@ public abstract class AbstractTurmaTableModel extends AbstractTableModel {
         } else {
             return getTurma(row).flatMap(turma -> getCampo(column, turma)).orElse(null);
         }
+    }
+
+    protected List<Disciplina> ordenarDisciplinasAlfabeticamente(Collection<Disciplina> disciplinas) {
+        return disciplinas.stream().sorted(Comparator.comparing(Disciplina::getNome)).toList();
     }
 
     public Optional<Disciplina> getDisciplina(int row) {
