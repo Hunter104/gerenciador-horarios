@@ -69,7 +69,7 @@ public class MainWindow implements PropertyChangeListener {
         turmasPossiveisTableModel = new TurmasEspecificasTableModel(planejador.getTurmasEscolhiveis());
         turmasPossiveisTable.setModel(turmasPossiveisTableModel);
 
-        turmasEscolhidasTableModel = new TurmasEspecificasTableModel(planejador.getTurmasEscolhidasSet());
+        turmasEscolhidasTableModel = new TurmasEspecificasTableModel(planejador.getTurmasEscolhidasEmSet());
         turmasEscolhidasTable.setModel(turmasEscolhidasTableModel);
 
         // Botões
@@ -180,12 +180,12 @@ public class MainWindow implements PropertyChangeListener {
                 chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
 
                 turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
-                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasEmSet());
             }
             case "turmas" -> {
                 crudTurmasModel.atualizarDados();
                 turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
-                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasEmSet());
             }
             case "conflitos" -> {
                 conflitosTableModel.setConflitos(planejador.getConflitos());
@@ -194,7 +194,7 @@ public class MainWindow implements PropertyChangeListener {
             }
             case "turmasEscolhidas" -> {
                 turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
-                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasEmSet());
             }
         }
     }

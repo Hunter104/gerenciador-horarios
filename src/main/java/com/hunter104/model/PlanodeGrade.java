@@ -191,7 +191,7 @@ public class PlanodeGrade implements PropertyChangeListener {
         this.turmasEscolhidas = turmasEscolhidas;
     }
 
-    public Map<Disciplina, Set<Turma>> getTurmasEscolhidasSet() {
+    public Map<Disciplina, Set<Turma>> getTurmasEscolhidasEmSet() {
         return turmasEscolhidas
                 .entrySet()
                 .stream()
