@@ -3,19 +3,11 @@ package com.hunter104.view;
 import com.hunter104.model.*;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
 public class ConflitosTableModel extends AbstractTableModel {
-    private static final int COL_HORARIO = 0;
-    private static final int COL_SEGUNDA = 1;
-    private static final int COL_TERCA = 2;
-    private static final int COL_QUARTA = 4;
-    private static final int COL_QUINTA = 5;
-    private static final int COL_SEXTA = 6;
-    private static final int COL_SABADO = 7;
-    private final String[] colunas = new String[]{"Horário", "Segunda",
-            "Terça", "Quarta", "Quinta", "Sexta", "Sábado"};
     Set<ConflitoHorario> conflitos;
 
     public ConflitosTableModel(Set<ConflitoHorario> conflitos) {
@@ -29,17 +21,22 @@ public class ConflitosTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return colunas.length;
+        return Coluna.values().length;
     }
 
     @Override
     public String getColumnName(int columnIndex) {
-        return colunas[columnIndex];
+        return getColuna(columnIndex).map(Coluna::nome).orElseThrow();
+    }
+
+    private Optional<Coluna> getColuna(int column) {
+        return Arrays.stream(Coluna.values()).filter(coluna -> coluna.num == column).findFirst();
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (columnIndex == COL_HORARIO) {
+        Coluna coluna = getColuna(columnIndex).orElseThrow();
+        if (coluna == Coluna.HORA) {
             return String.class;
         }
         return Boolean.class;
@@ -47,10 +44,11 @@ public class ConflitosTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (column == COL_HORARIO) {
+        Coluna coluna = getColuna(column).orElseThrow();
+        if (coluna == Coluna.HORA) {
             return Hora.values()[row].nome();
         } else {
-            return checarExisteConflitoNessaCelula(row, column);
+            return existeConflitoEmCelula(row, column);
         }
     }
 
@@ -93,5 +91,29 @@ public class ConflitosTableModel extends AbstractTableModel {
     public void setConflitos(Set<ConflitoHorario> conflitos) {
         this.conflitos = conflitos;
         fireTableDataChanged();
+    }
+
+    private enum Coluna {
+        HORA("Hora", 0),
+        SEGUNDA("Segunda", 1),
+        TERCA("Terça", 2),
+        QUARTA("Quarta", 3),
+        QUINTA("Quinta", 4),
+        SEXTA("Sexta", 5);
+        private final int num;
+        private final String nome;
+
+        Coluna(String nome, int num) {
+            this.num = num;
+            this.nome = nome;
+        }
+
+        public String nome() {
+            return nome;
+        }
+
+        public int num() {
+            return num;
+        }
     }
 }
