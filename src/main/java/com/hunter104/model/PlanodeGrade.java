@@ -88,11 +88,7 @@ public class PlanodeGrade implements PropertyChangeListener {
             conflitos.stream()
                     .flatMap(conflito -> conflito.filtrarTurmasOtimizaveisPorDisciplina().stream())
                     .flatMap(turmaPorDisciplina -> turmaPorDisciplina.entrySet().stream())
-                    .forEach(disciplinaTurmaEntry -> {
-                        Disciplina disciplina = disciplinaTurmaEntry.getKey();
-                        Set<Turma> turmas = disciplinaTurmaEntry.getValue();
-                        disciplina.removerTurmas(turmas);
-                    });
+                    .forEach(this::removerTurmasPorEntrada);
 
             atualizarConflitos();
             atualizarTurmasEscolhidas();
@@ -100,6 +96,12 @@ public class PlanodeGrade implements PropertyChangeListener {
 
         support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+    }
+
+    private void removerTurmasPorEntrada(Map.Entry<Disciplina, Set<Turma>> parTurmasDisciplina) {
+        Disciplina disciplina = parTurmasDisciplina.getKey();
+        Set<Turma> turmas = parTurmasDisciplina.getValue();
+        disciplina.removerTurmas(turmas);
     }
 
     public Map<Disciplina, Set<Turma>> getTurmasEscolhiveis() {
