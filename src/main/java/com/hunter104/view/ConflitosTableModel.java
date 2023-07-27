@@ -52,41 +52,38 @@ public class ConflitosTableModel extends AbstractTableModel {
         }
     }
 
-    private boolean checarExisteConflitoNessaCelula(int row, int column) {
-        DiadaSemana[] dias = DiadaSemana.values();
-        Hora[] horas = Hora.values();
-        for (int colunaAtual = 1; colunaAtual - 1 < dias.length; colunaAtual++) {
-            for (int linhaAtual = 1; linhaAtual < horas.length; linhaAtual++) {
-                if (column == colunaAtual && row == linhaAtual) {
-                    return getConflito(row, column).isPresent();
-                }
-            }
-        }
-        return false;
+    private boolean existeConflitoEmCelula(int row, int column) {
+        return getConflito(row, column).isPresent();
     }
 
-    private boolean checarExisteConflitoNesseDia(DiadaSemana dia, Hora hora) {
-        return conflitos
-                .stream().anyMatch(conflitoHorario -> conflitoHorario.dia() == dia && conflitoHorario.hora() == hora);
-    }
 
     public Optional<ConflitoHorario> getConflito(int row, int column) {
         DiadaSemana[] dias = DiadaSemana.values();
         Hora[] horas = Hora.values();
-        for (int colunaAtual = 1; colunaAtual - 1 < dias.length; colunaAtual++) {
-            for (int linhaAtual = 1; linhaAtual < horas.length; linhaAtual++) {
-                if (column == colunaAtual && row == linhaAtual) {
-                    DiadaSemana diaAtual = dias[colunaAtual - 1];
-                    Hora horaAtual = horas[linhaAtual];
-                    return conflitos
-                            .stream()
-                            .filter(conflitoHorario -> conflitoHorario.dia() == diaAtual && conflitoHorario.hora() == horaAtual)
-                            .findFirst();
-                }
-            }
+
+        // Aqui a coluna de dias tem um offset de 1, pois o primeiro dia na tablela
+        // começa na segunda coluna(index 1), mas no array o primeiro dia tem index 0
+        boolean diaInvalido = column < 1 || column - 1 > dias.length;
+        boolean horaInvalida = row < 1 || row > horas.length;
+
+        if (diaInvalido || horaInvalida) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        DiadaSemana diaAtual = dias[column - 1];
+        Hora horaAtual = horas[row];
+        return getConflito(diaAtual, horaAtual);
+
     }
+
+    public Optional<ConflitoHorario> getConflito(DiadaSemana dia, Hora hora) {
+        return conflitos
+                .stream()
+                .filter(conflitoHorario ->
+                        conflitoHorario.dia() == dia && conflitoHorario.hora() == hora)
+                .findFirst();
+    }
+
 
     public void setConflitos(Set<ConflitoHorario> conflitos) {
         this.conflitos = conflitos;
