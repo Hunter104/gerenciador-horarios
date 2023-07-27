@@ -13,11 +13,11 @@ public enum Turno {
         this.nome = nome;
     }
 
-    public String getCodigo() {
+    public String codigo() {
         return codigo;
     }
 
-    public String getNome() {
+    public String nome() {
         return nome;
     }
 }

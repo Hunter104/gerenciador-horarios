@@ -16,11 +16,11 @@ public enum DiadaSemana {
         this.codigo = codigo;
     }
 
-    public String getNome() {
+    public String nome() {
         return nome;
     }
 
-    public int getCodigo() {
+    public int codigo() {
         return codigo;
     }
 }

@@ -2,7 +2,6 @@ package com.hunter104.model;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,16 +18,16 @@ public record Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodi
             String codigoHorario = matcher.group(3);
 
             Set<DiadaSemana> dias = Arrays.stream(DiadaSemana.values())
-                    .filter(turno -> codigoDias.contains(String.valueOf(turno.getCodigo())))
+                    .filter(turno -> codigoDias.contains(String.valueOf(turno.codigo())))
                     .collect(Collectors.toSet());
 
             Turno turnoAtual = Arrays.stream(Turno.values())
-                    .filter(turnoPossivel -> turnoPossivel.getCodigo().equals(codigoTurno))
+                    .filter(turnoPossivel -> turnoPossivel.codigo().equals(codigoTurno))
                     .findFirst()
                     .orElseThrow();
 
             Set<Hora> horas = Arrays.stream(Hora.values())
-                    .filter(horarios -> horarios.getTurno().equals(turnoAtual) && codigoHorario.contains(horarios.getCodigo()))
+                    .filter(horarios -> horarios.turno().equals(turnoAtual) && codigoHorario.contains(horarios.codigo()))
                     .collect(Collectors.toSet());
 
             boolean nenhumDia = dias.size() == 0;
@@ -42,6 +41,7 @@ public record Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodi
             throw new IllegalArgumentException("código de horário tem formato inválido");
         }
     }
+
     public boolean temInterseccao(DiadaSemana dia, Hora hora) {
         return dias.contains(dia) && horas.contains(hora);
     }

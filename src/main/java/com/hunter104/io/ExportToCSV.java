@@ -53,7 +53,7 @@ public class ExportToCSV {
             // (0, 0) é a prímeira célula sem contar o cabeçalho
             for (Hora hora : horas) {
                 String[] dadosLinha = new String[]{};
-                dadosLinha[0] = hora.getNome();
+                dadosLinha[0] = hora.nome();
                 for (int coluna = 1; coluna - 1 < dias.length; coluna++) {
                     DiadaSemana diaAtual = dias[coluna];
                     String disciplinaNesseHorario = turmas

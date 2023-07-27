@@ -20,15 +20,15 @@ public enum Hora {
         this.turno = turno;
     }
 
-    public String getNome() {
+    public String nome() {
         return nome;
     }
 
-    public String getCodigo() {
+    public String codigo() {
         return codigo;
     }
 
-    public Turno getTurno() {
+    public Turno turno() {
         return turno;
     }
 }

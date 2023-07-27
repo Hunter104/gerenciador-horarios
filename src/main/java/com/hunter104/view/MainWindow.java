@@ -132,7 +132,7 @@ public class MainWindow implements PropertyChangeListener {
     }
 
     private String formatarConflito(ConflitoHorario conflito) {
-        return String.format("%s - %s", conflito.hora().getNome(), conflito.dia().getNome());
+        return String.format("%s - %s", conflito.hora().nome(), conflito.dia().nome());
     }
 
     private void mostrarDialogo(JDialog dialog, String titulo) {

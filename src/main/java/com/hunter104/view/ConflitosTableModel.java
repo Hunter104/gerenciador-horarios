@@ -14,9 +14,9 @@ public class ConflitosTableModel extends AbstractTableModel {
     private static final int COL_QUINTA = 5;
     private static final int COL_SEXTA = 6;
     private static final int COL_SABADO = 7;
-    Set<ConflitoHorario> conflitos;
     private final String[] colunas = new String[]{"Horário", "Segunda",
             "Terça", "Quarta", "Quinta", "Sexta", "Sábado"};
+    Set<ConflitoHorario> conflitos;
 
     public ConflitosTableModel(Set<ConflitoHorario> conflitos) {
         this.conflitos = conflitos;
@@ -53,7 +53,7 @@ public class ConflitosTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int row, int column) {
         if (column == COL_HORARIO) {
-            return Hora.values()[row].getNome();
+            return Hora.values()[row].nome();
         } else {
             return checarExisteConflitoNessaCelula(row, column);
         }
@@ -62,7 +62,7 @@ public class ConflitosTableModel extends AbstractTableModel {
     private boolean checarExisteConflitoNessaCelula(int row, int column) {
         DiadaSemana[] dias = DiadaSemana.values();
         Hora[] horas = Hora.values();
-        for (int colunaAtual = 1; colunaAtual-1 < dias.length; colunaAtual++) {
+        for (int colunaAtual = 1; colunaAtual - 1 < dias.length; colunaAtual++) {
             for (int linhaAtual = 1; linhaAtual < horas.length; linhaAtual++) {
                 if (column == colunaAtual && row == linhaAtual) {
                     return getConflito(row, column).isPresent();
@@ -80,7 +80,7 @@ public class ConflitosTableModel extends AbstractTableModel {
     public Optional<ConflitoHorario> getConflito(int row, int column) {
         DiadaSemana[] dias = DiadaSemana.values();
         Hora[] horas = Hora.values();
-        for (int colunaAtual = 1; colunaAtual-1 < dias.length; colunaAtual++) {
+        for (int colunaAtual = 1; colunaAtual - 1 < dias.length; colunaAtual++) {
             for (int linhaAtual = 1; linhaAtual < horas.length; linhaAtual++) {
                 if (column == colunaAtual && row == linhaAtual) {
                     DiadaSemana diaAtual = dias[colunaAtual - 1];
