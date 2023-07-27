@@ -4,8 +4,6 @@ import com.hunter104.model.Disciplina;
 import com.hunter104.model.Horario;
 import com.hunter104.model.Turma;
 
-import javax.swing.plaf.OptionPaneUI;
-import javax.swing.table.AbstractTableModel;
 import java.util.*;
 
 public class TurmasTableModel extends AbstractTurmaTableModel {

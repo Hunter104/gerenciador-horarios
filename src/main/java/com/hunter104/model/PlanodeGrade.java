@@ -4,7 +4,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -190,7 +189,6 @@ public class PlanodeGrade implements PropertyChangeListener {
         this.turmasEscolhidas = turmasEscolhidas;
     }
 
-    // TODO: fazer o turmas escolhidas ser um Map<Disciplina, Set<Turma>> para deixar o código mais generalizado
     public Map<Disciplina, Set<Turma>> getTurmasEscolhidasSet() {
         return turmasEscolhidas
                 .entrySet()

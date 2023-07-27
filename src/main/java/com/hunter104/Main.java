@@ -49,7 +49,4 @@ public class Main {
         return planejador;
     }
 
-    public static void main(String[] args) {
-
-    }
 }

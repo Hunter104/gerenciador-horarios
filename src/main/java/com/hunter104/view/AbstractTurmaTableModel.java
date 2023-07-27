@@ -4,7 +4,6 @@ import com.hunter104.model.Disciplina;
 import com.hunter104.model.Turma;
 
 import javax.swing.table.AbstractTableModel;
-import javax.swing.text.html.Option;
 import java.util.*;
 
 public abstract class AbstractTurmaTableModel extends AbstractTableModel {

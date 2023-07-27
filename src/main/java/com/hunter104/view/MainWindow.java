@@ -4,7 +4,6 @@ import com.hunter104.model.ConflitoHorario;
 import com.hunter104.model.Disciplina;
 import com.hunter104.model.PlanodeGrade;
 import com.hunter104.model.Turma;
-import com.sun.net.httpserver.Headers;
 
 import javax.swing.*;
 

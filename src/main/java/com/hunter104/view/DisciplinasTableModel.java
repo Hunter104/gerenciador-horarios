@@ -1,10 +1,8 @@
 package com.hunter104.view;
 
 import com.hunter104.model.Disciplina;
-import com.sun.source.doctree.SeeTree;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
