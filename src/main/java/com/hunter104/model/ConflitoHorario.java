@@ -2,11 +2,9 @@ package com.hunter104.model;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Turma>> turmas, boolean otimizavel,
-                              boolean impossivel) {
+public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Turma>> turmas) {
     /**
      * Checa todos os conflitos que todas as turmas das disciplinas escolhidas tem entre sí
      *
@@ -73,25 +71,37 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Tu
             , Hora hora, Map<Disciplina, Set<Turma>> turmasIntercedentesPorDisciplina) {
 
         if (turmasIntercedentesPorDisciplina.size() > 1) {
-            Set<Disciplina> disciplinasHorarioUnico = turmasIntercedentesPorDisciplina.keySet().stream()
-                    .filter(Disciplina::isHorarioUnico)
-                    .collect(Collectors.toSet());
-
-            boolean otimizavel = disciplinasHorarioUnico.size() == 1;
-            boolean impossivel = disciplinasHorarioUnico.size() > 1;
-
-            ConflitoHorario conflito = new ConflitoHorario(dia, hora, turmasIntercedentesPorDisciplina, otimizavel, impossivel);
+            ConflitoHorario conflito = new ConflitoHorario(dia, hora, turmasIntercedentesPorDisciplina);
             return Optional.of(conflito);
         } else {
             return Optional.empty();
         }
     }
 
-    public Map<Disciplina, Set<Turma>> filtrarTurmasOtimizaveisPorDisciplina() {
-        Disciplina horarioUnico = filtrarDisciplinasHorarioUnico().iterator().next();
-        return turmas.entrySet().stream()
-                .filter(turmaEntry -> !turmaEntry.getKey().equals(horarioUnico))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    public boolean isOtimizavel() {
+        return turmas.keySet().stream()
+                .filter(Disciplina::isHorarioUnico)
+                .count() == 1;
+    }
+
+    public boolean isImpossivel() {
+        return turmas.keySet().stream()
+                .filter(Disciplina::isHorarioUnico)
+                .count() > 1;
+    }
+
+    public Optional<Map<Disciplina, Set<Turma>>> filtrarTurmasOtimizaveisPorDisciplina() {
+        if (isOtimizavel()) {
+            Disciplina horarioUnico = filtrarDisciplinasHorarioUnico().iterator().next();
+            return Optional.of(
+                    turmas.entrySet().stream()
+                            .filter(turmaEntry -> !turmaEntry.getKey().equals(horarioUnico))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+            );
+        } else {
+            return Optional.empty();
+        }
+
     }
 
     public Set<Disciplina> filtrarDisciplinasHorarioUnico() {

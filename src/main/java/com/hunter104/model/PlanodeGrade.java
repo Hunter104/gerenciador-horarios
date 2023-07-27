@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -74,6 +75,34 @@ public class PlanodeGrade implements PropertyChangeListener {
     }
 
     // TODO: remover nome horrível
+
+    /**
+     * Remove turmas em conflito com disciplinas de horário único, já que não há como escolher um horário diferente
+     * para a disciplina, a única opção é remover as outras turmas do conflito.
+     */
+    public void removerTurmasInalcancaveis() {
+
+        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
+        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+
+        while (existemDisciplinasInalcancaveis()) {
+            conflitos.stream()
+                    .flatMap(conflito -> conflito.filtrarTurmasOtimizaveisPorDisciplina().stream())
+                    .flatMap(turmaPorDisciplina -> turmaPorDisciplina.entrySet().stream())
+                    .forEach(disciplinaTurmaEntry -> {
+                        Disciplina disciplina = disciplinaTurmaEntry.getKey();
+                        Set<Turma> turmas = disciplinaTurmaEntry.getValue();
+                        disciplina.removerTurmas(turmas);
+                    });
+
+            atualizarConflitos();
+            atualizarTurmasEscolhidas();
+        }
+
+        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
+        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+    }
+
     public Map<Disciplina, Set<Turma>> getTurmasEscolhiveis() {
         Set<Disciplina> disciplinasEscolhidas = turmasEscolhidas.keySet();
         return disciplinas.stream()
@@ -107,28 +136,8 @@ public class PlanodeGrade implements PropertyChangeListener {
         return ConflitoHorario.checarPorConflitos(turmasEscolhidas).size() > 0;
     }
 
-    /**
-     * Remove turmas em conflito com disciplinas de horário único, já que não há como escolher um horário diferente
-     * para a disciplina, a única opção é remover as outras turmas do conflito.
-     */
-    public void removerTurmasInalcancaveis() {
-        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
-        Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
-        while (existemDisciplinasInalcancaveis()) {
-            conflitos.stream()
-                    .filter(ConflitoHorario::otimizavel)
-                    .flatMap(conflitoHorario -> conflitoHorario.filtrarTurmasOtimizaveisPorDisciplina().entrySet().stream())
-                    .forEach(disciplinaTurmaEntry -> disciplinaTurmaEntry.getKey().removerTurmas(disciplinaTurmaEntry.getValue()));
-
-            atualizarConflitos();
-            atualizarTurmasEscolhidas();
-        }
-        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
-        support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
-    }
-
     public boolean existemDisciplinasInalcancaveis() {
-        return conflitos.stream().anyMatch(ConflitoHorario::otimizavel);
+        return conflitos.stream().anyMatch(ConflitoHorario::isOtimizavel);
     }
 
     public void atualizarConflitos() {

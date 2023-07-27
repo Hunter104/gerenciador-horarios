@@ -139,7 +139,7 @@ public class MainWindow implements PropertyChangeListener {
         conflitosTableModel.getConflito(row, column).ifPresent(conflito -> {
             turmasConflitoTableModel.setTurmas(conflito.turmas());
             conflitoEscolhidoLabel.setText(formatarConflito(conflito));
-            otimizavelLabel.setText(conflito.otimizavel() ? "Sim" : "Não");
+            otimizavelLabel.setText(conflito.isOtimizavel() ? "Sim" : "Não");
         });
     }
 
