@@ -79,8 +79,7 @@ public class ConflitosTableModel extends AbstractTableModel {
     public Optional<ConflitoHorario> getConflito(DiadaSemana dia, Hora hora) {
         return conflitos
                 .stream()
-                .filter(conflitoHorario ->
-                        conflitoHorario.dia() == dia && conflitoHorario.hora() == hora)
+                .filter(conflitoHorario -> conflitoHorario.dia() == dia && conflitoHorario.hora() == hora)
                 .findFirst();
     }
 
