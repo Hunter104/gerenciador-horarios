@@ -11,7 +11,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
 
-import static com.hunter104.Main.criarPlanejadorComDados;
+import static com.hunter104.Utils.criarPlanejadorComDados;
 
 public class MainWindow implements PropertyChangeListener {
     private final DisciplinasTableModel crudDisciplinasModel;
