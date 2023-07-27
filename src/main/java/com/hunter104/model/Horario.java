@@ -47,10 +47,15 @@ public record Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodi
     }
 
     public boolean temInterseccao(Horario horario) {
-        Set<DiadaSemana> diasIntercedentes = new HashSet<>(horario.dias());
-        Set<Hora> horasIntercedentes = new HashSet<>(horario.horas());
-        diasIntercedentes.retainAll(this.dias);
-        horasIntercedentes.retainAll(this.horas);
-        return diasIntercedentes.size() > 0 && horasIntercedentes.size() > 0;
+        boolean diasIntercedem = conjuntosIntercedem(horario.dias(), dias);
+        boolean horasIntercedem = conjuntosIntercedem(horario.horas(), horas);
+
+        return diasIntercedem && horasIntercedem;
+    }
+
+    public <T> boolean conjuntosIntercedem(Set<T> primeiroConjunto, Set<T> segundoConjunto) {
+        Set<T> conjuntosIntercedentes = new HashSet<>(primeiroConjunto);
+        conjuntosIntercedentes.retainAll(segundoConjunto);
+        return conjuntosIntercedentes.size() > 0;
     }
 }
