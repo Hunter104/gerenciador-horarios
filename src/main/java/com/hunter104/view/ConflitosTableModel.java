@@ -46,11 +46,6 @@ public class ConflitosTableModel extends AbstractTableModel {
     }
 
     @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return false;
-    }
-
-    @Override
     public Object getValueAt(int row, int column) {
         if (column == COL_HORARIO) {
             return Hora.values()[row].nome();
