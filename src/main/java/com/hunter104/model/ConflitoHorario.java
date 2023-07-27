@@ -1,6 +1,8 @@
 package com.hunter104.model;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Turma>> turmas, boolean otimizavel,
@@ -12,15 +14,8 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Tu
      * @return um conjunto de objetosConflito representando os conflitos encontrados
      */
     public static Set<ConflitoHorario> checarPorConflitos(Set<Disciplina> disciplinas) {
-        Set<ConflitoHorario> conflitos = new HashSet<>();
-        for (DiadaSemana dia : DiadaSemana.values()) {
-            for (Hora hora : Hora.values()) {
-                ConflitoHorario.checarPorConflito(dia, hora, disciplinas).ifPresent(conflitos::add);
-            }
-        }
-        return conflitos;
+        return checarPorConflitos((dia, hora) -> checarPorConflito(dia, hora, disciplinas));
     }
-
 
     /**
      * Checa todos os conflitos que todas as turmas escolhidas tem entre sí
@@ -29,14 +24,20 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Tu
      * @return um conjunto de objetosConflito representando os conflitos encontrados
      */
     public static Set<ConflitoHorario> checarPorConflitos(Map<Disciplina, Turma> turmaPorDisciplina) {
+        return checarPorConflitos((dia, hora) -> checarPorConflito(dia, hora, turmaPorDisciplina));
+    }
+
+    private static Set<ConflitoHorario> checarPorConflitos(
+            BiFunction<DiadaSemana, Hora, Optional<ConflitoHorario>> checador) {
         Set<ConflitoHorario> conflitos = new HashSet<>();
         for (DiadaSemana dia : DiadaSemana.values()) {
             for (Hora hora : Hora.values()) {
-                ConflitoHorario.checarPorConflito(dia, hora, turmaPorDisciplina).ifPresent(conflitos::add);
+                checador.apply(dia, hora).ifPresent(conflitos::add);
             }
         }
         return conflitos;
     }
+
 
     /**
      * Checa por todas as turmas do conjunto de disciplinas que se conflitam em um certo bloco de horário
