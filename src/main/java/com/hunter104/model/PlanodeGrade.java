@@ -8,8 +8,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class PlanodeGrade implements PropertyChangeListener {
-    private static final int ADICIONAR = 0;
-    private static final int REMOVER = 1;
+    private enum Operacao {ADICIONAR, REMOVER}
+
+    ;
     private final Set<Disciplina> disciplinas;
     private final PropertyChangeSupport support;
     private Set<ConflitoHorario> conflitos;
@@ -36,7 +37,7 @@ public class PlanodeGrade implements PropertyChangeListener {
 
     public void adicionarDisciplina(Disciplina disciplina) {
         disciplina.addPropertyChangeListener(this);
-        operareNotificar(disciplina, ADICIONAR);
+        operareNotificar(disciplina, Operacao.ADICIONAR);
     }
 
     public void removerDisciplina(String nome) {
@@ -44,10 +45,10 @@ public class PlanodeGrade implements PropertyChangeListener {
     }
 
     public void removerDisciplina(Disciplina disciplina) {
-        operareNotificar(disciplina, REMOVER);
+        operareNotificar(disciplina, Operacao.REMOVER);
     }
 
-    private void operareNotificar(Disciplina disciplina, int operacao) {
+    private void operareNotificar(Disciplina disciplina, Operacao operacao) {
 
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
