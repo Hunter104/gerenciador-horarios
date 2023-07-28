@@ -4,18 +4,13 @@ import com.hunter104.model.Disciplina;
 import com.hunter104.model.Horario;
 import com.hunter104.model.Turma;
 
-import javax.swing.plaf.OptionPaneUI;
-import javax.swing.table.AbstractTableModel;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class TurmasTableModel extends AbstractTurmaTableModel {
     List<Disciplina> disciplinas;
 
-    public TurmasTableModel(List<Disciplina> disciplinas) {
-        this.disciplinas = disciplinas;
+    public TurmasTableModel(Collection<Disciplina> disciplinas) {
+        this.disciplinas = ordenarDisciplinasAlfabeticamente(disciplinas);
     }
 
     @Override
@@ -39,7 +34,7 @@ public class TurmasTableModel extends AbstractTurmaTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex != COL_DISCIPLINA;
+        return columnIndex != Coluna.DISCIPLINA.num();
     }
 
     @Override
@@ -48,22 +43,34 @@ public class TurmasTableModel extends AbstractTurmaTableModel {
     }
 
     /**
-     * Modifica o campo de uma turma presente em uma certa coluna
+     * Modifica o campo naquela coluna de uma turma
      *
      * @param turma  turma a ter o campo lido
-     * @param column coluna onde o campo está presente
+     * @param column número coluna onde o campo está presente
+     * @param valor  valor a modificar o campo
      */
     private void setCampo(int column, Turma turma, Object valor) {
+        getColumnEnum(column).ifPresent(colunaEnum -> setCampo(colunaEnum, turma, valor));
+    }
+
+    /**
+     * Modifica o campo naquela coluna de uma turma
+     *
+     * @param turma  turma a ter o campo lido
+     * @param column constante da coluna onde o campo está presente
+     * @param valor  valor a modificar o campo
+     */
+    private void setCampo(Coluna column, Turma turma, Object valor) {
         switch (column) {
-            case COL_ID -> turma.setId((Integer) valor);
-            case COL_PROFESSOR -> turma.setProfessor((String) valor);
-            case COL_HORARIO -> turma.setHorario(Horario.criarFromCodigo((String) valor));
-            case COL_SALA -> turma.setSalas((String) valor);
+            case ID -> turma.setId((Integer) valor);
+            case PROFESSOR -> turma.setProfessor((String) valor);
+            case HORARIO -> turma.setHorario(Horario.criarFromCodigo((String) valor));
+            case SALA -> turma.setSalas((String) valor);
         }
     }
 
-    public void setDisciplinas(List<Disciplina> disciplinas) {
-        this.disciplinas = disciplinas;
+    public void setDisciplinas(Collection<Disciplina> disciplinas) {
+        this.disciplinas = ordenarDisciplinasAlfabeticamente(disciplinas);
         fireTableDataChanged();
     }
 

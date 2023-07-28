@@ -3,7 +3,7 @@ package com.hunter104;
 import com.hunter104.model.Disciplina;
 import com.hunter104.model.PlanodeGrade;
 
-public class Main {
+public class Utils {
 
     public static PlanodeGrade criarPlanejadorComDados() {
         PlanodeGrade planejador = new PlanodeGrade();
@@ -49,7 +49,4 @@ public class Main {
         return planejador;
     }
 
-    public static void main(String[] args) {
-
-    }
 }

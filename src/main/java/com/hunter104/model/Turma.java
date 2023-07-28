@@ -1,7 +1,6 @@
 package com.hunter104.model;
 
 import java.util.Collection;
-import java.util.Objects;
 
 public class Turma {
     private int id;

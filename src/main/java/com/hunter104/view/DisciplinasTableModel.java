@@ -3,20 +3,17 @@ package com.hunter104.view;
 import com.hunter104.model.Disciplina;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class DisciplinasTableModel extends AbstractTableModel {
-    private static final int COL_CODIGO = 0;
-    private static final int COL_NOME = 1;
-    private static final int COL_ABREVIACAO = 2;
-    private static final int COL_CARGA_HORARIA = 3;
     List<Disciplina> linhas;
-    private final String[] colunas = new String[]{"Código", "Nome",
-            "Abreviação", "Carga horária"};
 
-    public DisciplinasTableModel(List<Disciplina> disciplinas) {
-        this.linhas = new ArrayList<>(disciplinas);
+    public DisciplinasTableModel(Collection<Disciplina> disciplinas) {
+        this.linhas = ordenarDisciplinasAlfabeticamente(disciplinas);
+    }
+
+    private List<Disciplina> ordenarDisciplinasAlfabeticamente(Collection<Disciplina> disciplinas) {
+        return disciplinas.stream().sorted(Comparator.comparing(Disciplina::getNome)).toList();
     }
 
     @Override
@@ -26,17 +23,21 @@ public class DisciplinasTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return colunas.length;
+        return Coluna.values().length;
     }
 
     @Override
     public String getColumnName(int columnIndex) {
-        return colunas[columnIndex];
+        return Arrays.stream(Coluna.values())
+                .filter(coluna -> coluna.num == columnIndex)
+                .map(coluna -> coluna.nome)
+                .findFirst()
+                .orElseThrow();
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (columnIndex == COL_CARGA_HORARIA) {
+        if (columnIndex == Coluna.CARGA_HORARIA.num) {
             return Integer.class;
         }
         return String.class;
@@ -52,38 +53,52 @@ public class DisciplinasTableModel extends AbstractTableModel {
     public Object getValueAt(int row, int column) {
 
         Disciplina m = linhas.get(row);
-        return switch (column) {
-            case COL_CODIGO -> m.getCodigo();
-            case COL_NOME -> m.getNome();
-            case COL_CARGA_HORARIA -> m.getCargaHoraria();
-            case COL_ABREVIACAO -> m.getAbreviacao();
-            default -> null;
+        Coluna colunaEnum = getColunaEnum(column).orElseThrow();
+        return switch (colunaEnum) {
+            case CODIGO -> m.getCodigo();
+            case NOME -> m.getNome();
+            case CARGA_HORARIA -> m.getCargaHoraria();
+            case ABREVIACAO -> m.getAbreviacao();
         };
     }
 
     @Override
-    public void setValueAt(Object aValue, int row,
-                           int column) {
+    public void setValueAt(Object aValue, int row, int column) {
         Disciplina d = linhas.get(row);
-        switch (column) {
-            case COL_CODIGO -> d.setCodigo(aValue.toString());
-            case COL_NOME -> d.setNome(aValue.toString());
-            case COL_CARGA_HORARIA -> d.setCargaHoraria((Integer) aValue);
-            case COL_ABREVIACAO -> d.setAbreviacao(aValue.toString());
+        Coluna colunaEnum = getColunaEnum(column).orElseThrow();
+        switch (colunaEnum) {
+            case CODIGO -> d.setCodigo(aValue.toString());
+            case NOME -> d.setNome(aValue.toString());
+            case CARGA_HORARIA -> d.setCargaHoraria((Integer) aValue);
+            case ABREVIACAO -> d.setAbreviacao(aValue.toString());
         }
+    }
+
+    private Optional<Coluna> getColunaEnum(int column) {
+        return Arrays.stream(Coluna.values()).filter(coluna -> coluna.num == column).findFirst();
     }
 
     public Disciplina getDisciplina(int indiceLinha) {
         return linhas.get(indiceLinha);
     }
 
-    public void removeContato(int indiceLinha) {
-        linhas.remove(indiceLinha);
-        fireTableRowsDeleted(indiceLinha, indiceLinha);
+    public void setLinhas(Collection<Disciplina> linhas) {
+        this.linhas = ordenarDisciplinasAlfabeticamente(linhas);
+        fireTableDataChanged();
     }
 
-    public void setLinhas(List<Disciplina> linhas) {
-        this.linhas = linhas;
-        fireTableDataChanged();
+    private enum Coluna {
+        CODIGO("Código", 0),
+        NOME("Nome", 1),
+        CARGA_HORARIA("Carga horária", 2),
+        ABREVIACAO("Abreviação", 3);
+        private final int num;
+        private final String nome;
+
+        Coluna(String nome, int num) {
+            this.nome = nome;
+            this.num = num;
+        }
+
     }
 }

@@ -11,7 +11,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
 
-import static com.hunter104.Main.criarPlanejadorComDados;
+import static com.hunter104.Utils.criarPlanejadorComDados;
 
 public class MainWindow implements PropertyChangeListener {
     private final DisciplinasTableModel crudDisciplinasModel;
@@ -54,10 +54,10 @@ public class MainWindow implements PropertyChangeListener {
         planejador.getDisciplinas().forEach(disciplina -> disciplina.addPropertyChangeListener(this));
 
         // Tabelas
-        crudDisciplinasModel = new DisciplinasTableModel(planejador.getDisciplinasOrdemAlfabetica());
+        crudDisciplinasModel = new DisciplinasTableModel(planejador.getDisciplinas());
         disciplinasCrudTable.setModel(crudDisciplinasModel);
 
-        crudTurmasModel = new TurmasTableModel(planejador.getDisciplinasOrdemAlfabetica());
+        crudTurmasModel = new TurmasTableModel(planejador.getDisciplinas());
         turmasCrudTable.setModel(crudTurmasModel);
 
         conflitosTableModel = new ConflitosTableModel(planejador.getConflitos());
@@ -69,51 +69,76 @@ public class MainWindow implements PropertyChangeListener {
         turmasPossiveisTableModel = new TurmasEspecificasTableModel(planejador.getTurmasEscolhiveis());
         turmasPossiveisTable.setModel(turmasPossiveisTableModel);
 
-        turmasEscolhidasTableModel = new TurmasEspecificasTableModel(planejador.getTurmasEscolhidasSet());
+        turmasEscolhidasTableModel = new TurmasEspecificasTableModel(planejador.getTurmasEscolhidasEmSet());
         turmasEscolhidasTable.setModel(turmasEscolhidasTableModel);
 
         // Botões
-        adicionarDisciplinaButton.addActionListener(e ->
-                mostrarDialogo(new AdicionarDisciplina(planejador), "Cadastrar nova disciplina")
-        );
-        removerDisciplinaButton.addActionListener(e -> planejador.removerDisciplina(
-                crudDisciplinasModel.getDisciplina(disciplinasCrudTable.getSelectedRow())
-        ));
+        adicionarDisciplinaButton.addActionListener(e -> adicionarDisciplina());
+        removerDisciplinaButton.addActionListener(e -> removerDisicplina());
 
-        adicionarTurmaButton.addActionListener(e ->
-                mostrarDialogo(new AdicionarTurma(planejador), "Cadastrar nova turma")
-        );
-        removerTurmaButton.addActionListener(e -> {
-            int row = turmasCrudTable.getSelectedRow();
-            Optional<Turma> turmaEscolhida = crudTurmasModel.getTurma(row);
-            Optional<Disciplina> disciplinaEscolhida = crudTurmasModel.getDisciplina(row);
-            turmaEscolhida.ifPresent(turma ->
-                    disciplinaEscolhida.ifPresent(disciplina -> disciplina.removerTurma(turma))
-            );
-        });
+        adicionarTurmaButton.addActionListener(e -> adicionarTurma());
+        removerTurmaButton.addActionListener(e -> removerTurma());
 
-        // TODO: trocar null checks por optionals
-        visualizarConflitoButton.addActionListener(e -> {
-            int row = horarioConflitoTable.getSelectedRow();
-            int column = horarioConflitoTable.getSelectedColumn();
-            conflitosTableModel.getConflito(row, column).ifPresent(conflito -> {
-                turmasConflitoTableModel.setTurmas(conflito.turmas());
-                conflitoEscolhidoLabel.setText(formatarConflito(conflito));
-                otimizavelLabel.setText(conflito.otimizavel() ? "Sim" : "Não");
-            });
-
-        });
+        visualizarConflitoButton.addActionListener(e -> visualizarConflito());
         otimizarButton.addActionListener(e -> planejador.removerTurmasInalcancaveis());
+
+        escolherTurmaButton.addActionListener(e -> escolherTurma());
 
         // Labels
         chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
-        disciplinasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
-        turmasTituloLabel.putClientProperty("FlatLaf.styleClass", "h1");
 
-        escolherTurmaButton.addActionListener(e -> {
-            int row = turmasPossiveisTable.getSelectedRow();
-            Optional<Map.Entry<Disciplina, Turma>> turmaEscolhida = turmasPossiveisTableModel.getElemento(row);
-            turmaEscolhida.ifPresent(planejador::escolherUmaTurma);
+        setLabelHeader(disciplinasTituloLabel, Header.H1);
+        setLabelHeader(turmasTituloLabel, Header.H1);
+    }
+
+    private void setLabelHeader(JLabel label, Header header) {
+        label.putClientProperty("FlatLaf.styleClass", header.code);
+    }
+
+    private void setLabelStyle(JLabel label, FontStyle style) {
+        label.putClientProperty("FlatLaf.styleClass", style.code);
+    }
+
+    private void setLabelSize(JLabel label, FontSize size) {
+        label.putClientProperty("FlatLaf.styleClass", size.code);
+    }
+
+    private void adicionarTurma() {
+        mostrarDialogo(new AdicionarTurma(planejador), "Cadastrar nova turma");
+    }
+
+    private void adicionarDisciplina() {
+        mostrarDialogo(new AdicionarDisciplina(planejador), "Cadastrar nova disciplina");
+    }
+
+    private void removerDisicplina() {
+        int linhaEscolhida = disciplinasCrudTable.getSelectedRow();
+        Disciplina disciplinaSelecionada = crudDisciplinasModel.getDisciplina(linhaEscolhida);
+        planejador.removerDisciplina(disciplinaSelecionada);
+    }
+
+    private void escolherTurma() {
+        int row = turmasPossiveisTable.getSelectedRow();
+        Optional<Map.Entry<Disciplina, Turma>> turmaEscolhida = turmasPossiveisTableModel.getElemento(row);
+        turmaEscolhida.ifPresent(planejador::escolherUmaTurma);
+    }
+
+    private void removerTurma() {
+        int row = turmasCrudTable.getSelectedRow();
+        Optional<Turma> turmaEscolhida = crudTurmasModel.getTurma(row);
+        Optional<Disciplina> disciplinaEscolhida = crudTurmasModel.getDisciplina(row);
+        turmaEscolhida.ifPresent(turma ->
+                disciplinaEscolhida.ifPresent(disciplina -> disciplina.removerTurma(turma))
+        );
+    }
+
+    private void visualizarConflito() {
+        int row = horarioConflitoTable.getSelectedRow();
+        int column = horarioConflitoTable.getSelectedColumn();
+        conflitosTableModel.getConflito(row, column).ifPresent(conflito -> {
+            turmasConflitoTableModel.setTurmas(conflito.turmas());
+            conflitoEscolhidoLabel.setText(formatarConflito(conflito));
+            otimizavelLabel.setText(conflito.isOtimizavel() ? "Sim" : "Não");
         });
     }
 
@@ -132,7 +157,7 @@ public class MainWindow implements PropertyChangeListener {
     }
 
     private String formatarConflito(ConflitoHorario conflito) {
-        return String.format("%s - %s", conflito.hora().getNome(), conflito.dia().getNome());
+        return String.format("%s - %s", conflito.hora().nome(), conflito.dia().nome());
     }
 
     private void mostrarDialogo(JDialog dialog, String titulo) {
@@ -147,7 +172,7 @@ public class MainWindow implements PropertyChangeListener {
             case "disciplinas" -> {
                 planejador.getDisciplinas().forEach(disciplina -> disciplina.addPropertyChangeListener(this));
 
-                List<Disciplina> novasDisciplinas = planejador.getDisciplinasOrdemAlfabetica();
+                Set<Disciplina> novasDisciplinas = planejador.getDisciplinas();
 
                 crudDisciplinasModel.setLinhas(novasDisciplinas);
                 crudTurmasModel.setDisciplinas(novasDisciplinas);
@@ -155,12 +180,12 @@ public class MainWindow implements PropertyChangeListener {
                 chHorasLabel.setText(String.valueOf(planejador.getCargaHorariaTotalHoras()));
 
                 turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
-                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasEmSet());
             }
             case "turmas" -> {
                 crudTurmasModel.atualizarDados();
                 turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
-                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasEmSet());
             }
             case "conflitos" -> {
                 conflitosTableModel.setConflitos(planejador.getConflitos());
@@ -169,8 +194,62 @@ public class MainWindow implements PropertyChangeListener {
             }
             case "turmasEscolhidas" -> {
                 turmasPossiveisTableModel.setTurmas(planejador.getTurmasEscolhiveis());
-                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasSet());
+                turmasEscolhidasTableModel.setTurmas(planejador.getTurmasEscolhidasEmSet());
             }
         }
     }
+
+    private enum Header {
+        H00("h00"),
+        H0("h0"),
+        H1("h1"),
+        H2("h2"),
+        H3("h3"),
+        H4("h4");
+        private final String code;
+
+        Header(String code) {
+            this.code = code;
+        }
+
+        public String code() {
+            return code;
+        }
+    }
+
+    private enum FontSize {
+        LARGE("large"),
+        DEFAULT("default"),
+        MEDIUM("medium"),
+        SMALL("small"),
+        Mini("mini");
+        private final String code;
+
+        FontSize(String code) {
+            this.code = code;
+        }
+
+        public String code() {
+            return code;
+        }
+    }
+
+    private enum FontStyle {
+        MONOSPACED("monospaced"),
+        LIGHT("light"),
+        SEMIBOLD("semibold");
+        private final String code;
+
+        FontStyle(String code) {
+            this.code = code;
+        }
+
+        public String code() {
+            return code;
+        }
+    }
+
 }
+
+
+
