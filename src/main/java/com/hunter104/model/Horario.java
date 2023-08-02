@@ -16,7 +16,7 @@ public record Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodi
     }
 
     public static Horario criarFromCodigo(String horarioCodificado) {
-        Pattern pattern = Pattern.compile("^([2-7]+)([MNT])([1-5]+)$", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("^([2-7]+)([MNT])([1-6]+)$");
         Matcher matcher = pattern.matcher(horarioCodificado);
 
         if (matcher.find()) {
@@ -34,7 +34,7 @@ public record Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodi
 
     private static Set<Hora> parseHoras(String codigoHoras, Turno turno) {
         return Arrays.stream(Hora.values())
-                .filter(horarios -> horarios.turno().equals(turno) && codigoHoras.contains(horarios.codigo()))
+                .filter(horarios -> horarios.turno() == turno && codigoHoras.contains(horarios.codigo()))
                 .collect(Collectors.toCollection(() -> EnumSet.noneOf(Hora.class)));
     }
 
@@ -46,9 +46,9 @@ public record Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodi
 
     private static Turno parseTurno(String codigoTurno) {
         return Arrays.stream(Turno.values())
-                .filter(turnoPossivel -> turnoPossivel.codigo().equals(codigoTurno))
+                .filter(turno -> Objects.equals(turno.codigo(), codigoTurno))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(IllegalArgumentException::new);
     }
 
     public boolean temInterseccao(DiadaSemana dia, Hora hora) {
