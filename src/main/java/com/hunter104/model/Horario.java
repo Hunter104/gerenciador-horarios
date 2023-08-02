@@ -40,7 +40,7 @@ public record Horario(Set<DiadaSemana> dias, Set<Hora> horas, String horarioCodi
 
     private static Set<DiadaSemana> parseDias(String codigoDias) {
         return Arrays.stream(DiadaSemana.values())
-                .filter(turno -> codigoDias.contains(String.valueOf(turno.codigo())))
+                .filter(dia -> codigoDias.contains(dia.codigo()))
                 .collect(Collectors.toCollection(() -> EnumSet.noneOf(DiadaSemana.class)));
     }
 
