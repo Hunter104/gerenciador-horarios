@@ -23,10 +23,10 @@ public class Utils {
         Disciplina pi = new Disciplina("FGA0150", "PROJETO INTEGRADOR DE ENGENHARIA 1", "PI", 60);
         planejador.adicionarDisciplina(pi);
         pi.adicionarTurma(4, "DIOGO CAETANO GARCIA", "S2/I1", "24T45");
-        pi.adicionarTurma(5, "RAFAEL RODRIGUES DA SILVA", "S2/S6", "24T45");
-        pi.adicionarTurma(6, "ARTUR ELIAS DE MORAIS BERTOLDI", "S2/S5", "24T45");
-        pi.adicionarTurma(7, "JULIANA PETROCCHI RODRIGUES", "S2", "24T45");
-        pi.adicionarTurma(8, "RICARDO AJAX DIAS KOSLOSKI", "S2/I4", "24T45");
+        pi.adicionarTurma(6, "RAFAEL RODRIGUES DA SILVA", "S2/S6", "24T45");
+        pi.adicionarTurma(7, "ARTUR ELIAS DE MORAIS BERTOLDI", "S2/S5", "24T45");
+        pi.adicionarTurma(8, "JULIANA PETROCCHI RODRIGUES", "S2", "24T45");
+        pi.adicionarTurma(9, "RICARDO AJAX DIAS KOSLOSKI", "S2/I4", "24T45");
 
         Disciplina fac = new Disciplina("FGA0142", "FUNDAMENTOS DE ARQUITETURA DE COMPUTADORES", "FAC", 60);
         planejador.adicionarDisciplina(fac);
@@ -43,7 +43,7 @@ public class Utils {
         Disciplina gpq = new Disciplina("FGA0184", "GESTAO DE PRODUCAO E QUALIDADE", "GPQ", 60);
         planejador.adicionarDisciplina(gpq);
         gpq.adicionarTurma(1, "REJANE MARIA DA COSTA FIGUEIREIDO", "I9", "35T23");
-        gpq.adicionarTurma(2, "MARIO DE OLIVEIRA ANDRADE", "S3", "35T23");
+        gpq.adicionarTurma(2, "MARIO DE OLIVEIRA ANDRADE", "S3", "35T45");
 
 //        planejador.removerTurmasInalcancaveis();
         return planejador;
