@@ -4,13 +4,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class PlanodeGrade implements PropertyChangeListener {
     private enum Operacao {ADICIONAR, REMOVER}
 
-    ;
     private final Set<Disciplina> disciplinas;
     private final PropertyChangeSupport support;
     private Set<ConflitoHorario> conflitos;
@@ -37,7 +37,7 @@ public class PlanodeGrade implements PropertyChangeListener {
 
     public void adicionarDisciplina(Disciplina disciplina) {
         disciplina.addPropertyChangeListener(this);
-        operareNotificar(disciplina, Operacao.ADICIONAR);
+        modificarDisciplinas(disciplinas::add, disciplina);
     }
 
     public void removerDisciplina(String nome) {
@@ -45,19 +45,16 @@ public class PlanodeGrade implements PropertyChangeListener {
     }
 
     public void removerDisciplina(Disciplina disciplina) {
-        operareNotificar(disciplina, Operacao.REMOVER);
+        modificarDisciplinas(disciplinas::remove, disciplina);
     }
 
-    private void operareNotificar(Disciplina disciplina, Operacao operacao) {
+    private void modificarDisciplinas(Consumer<Disciplina> operacao, Disciplina disciplina) {
 
         Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
         Map<Disciplina, Turma> turmasEscolhidasAntigas = new HashMap<>(turmasEscolhidas);
 
-        switch (operacao) {
-            case ADICIONAR -> disciplinas.add(disciplina);
-            case REMOVER -> disciplinas.remove(disciplina);
-        }
+        operacao.accept(disciplina);
         atualizarConflitos();
         atualizarTurmasEscolhidas();
 
@@ -78,14 +75,15 @@ public class PlanodeGrade implements PropertyChangeListener {
 
     /**
      * Remove turmas em conflito com disciplinas de horário único, já que não há como escolher um horário diferente
-     * para a disciplina, a única opção é remover as outras turmas do conflito.
+     * para tal disciplina, a única opção é remover as outras turmas do conflito.
      */
     public void removerTurmasInalcancaveis() {
 
-        Set<Disciplina> disciplinasAntigas = new HashSet<>(disciplinas);
         Set<ConflitoHorario> conflitosAntigos = new HashSet<>(conflitos);
+        Map<Disciplina, Turma> turmasEscolhidasAntigas = new HashMap<>(turmasEscolhidas);
 
-        while (existemDisciplinasInalcancaveis()) {
+
+        while (podeOtimizar()) {
             conflitos.stream()
                     .flatMap(conflito -> conflito.filtrarTurmasOtimizaveisPorDisciplina().stream())
                     .flatMap(turmaPorDisciplina -> turmaPorDisciplina.entrySet().stream())
@@ -95,8 +93,8 @@ public class PlanodeGrade implements PropertyChangeListener {
             atualizarTurmasEscolhidas();
         }
 
-        support.firePropertyChange("disciplinas", disciplinasAntigas, disciplinas);
         support.firePropertyChange("conflitos", conflitosAntigos, conflitos);
+        support.firePropertyChange("turmasEscolhidas", turmasEscolhidasAntigas, turmasEscolhidas);
     }
 
     private void removerTurmasPorEntrada(Map.Entry<Disciplina, Set<Turma>> parTurmasDisciplina) {
@@ -138,7 +136,7 @@ public class PlanodeGrade implements PropertyChangeListener {
         return ConflitoHorario.checarPorConflitos(turmasEscolhidas).size() > 0;
     }
 
-    public boolean existemDisciplinasInalcancaveis() {
+    public boolean podeOtimizar() {
         return conflitos.stream().anyMatch(ConflitoHorario::isOtimizavel);
     }
 
