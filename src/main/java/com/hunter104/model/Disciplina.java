@@ -3,11 +3,11 @@ package com.hunter104.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Disciplina {
-    private static final int ADICIONAR = 0;
-    private static final int REMOVER = 1;
     private final PropertyChangeSupport support;
     private String nome;
     private int cargaHoraria;
@@ -43,7 +43,7 @@ public class Disciplina {
     }
 
     public void adicionarTurma(Turma turma) {
-        operareNotificar(turma, ADICIONAR);
+        operareNotificar(turmas::add, turma);
     }
 
     public void removerTurma(int id) {
@@ -55,15 +55,12 @@ public class Disciplina {
     }
 
     public void removerTurma(Turma turma) {
-        operareNotificar(turma, REMOVER);
+        operareNotificar(turmas::remove, turma);
     }
 
-    private void operareNotificar(Turma turma, int operacao) {
+    private void operareNotificar(Consumer<Turma> operacao, Turma turma) {
         Set<Turma> turmasAntigas = new HashSet<>(turmas);
-        switch (operacao) {
-            case ADICIONAR -> turmas.add(turma);
-            case REMOVER -> turmas.remove(turma);
-        }
+        operacao.accept(turma);
         support.firePropertyChange("turmas", turmasAntigas, turmas);
     }
 
