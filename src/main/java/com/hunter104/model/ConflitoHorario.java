@@ -84,7 +84,7 @@ public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Tu
                 .count() == 1;
     }
 
-    public boolean isImpossivel() {
+    public boolean isIrreconciliavel() {
         return turmas.keySet().stream()
                 .filter(Disciplina::isHorarioUnico)
                 .count() > 1;
