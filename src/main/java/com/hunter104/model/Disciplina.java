@@ -52,6 +52,7 @@ public class Disciplina {
     public void removerTurmas(Collection<Turma> turmas) {
         turmas.forEach(this::removerTurma);
     }
+    //m
 
     public void removerTurma(Turma turma) {
         operareNotificar(turmas::remove, turma);
