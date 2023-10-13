@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public record ConflitoHorario(DiadaSemana dia, Hora hora, Map<Disciplina, Set<Turma>> turmas) {
     /**
-     * Checa todos os conflitos que todas as turmas das disciplinas escolhidas tem entre sí
+     * Checar todos os conflitos que todas as turmas das disciplinas escolhidas tem entre sí
      *
      * @param disciplinas disciplinas a checar pelos conflitos
      * @return um conjunto de objetosConflito representando os conflitos encontrados
